@@ -146,6 +146,21 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
 .mc.susp{opacity:0.65;}
 .mc.susp::before{content:'';position:absolute;inset:0;background:rgba(7,9,12,0.3);
   border-radius:var(--r-lg);z-index:1;pointer-events:none;}
+/* R23: Mock data indicator — cyan border on any card with non-live data */
+.mc.mock-data{border-color:rgba(0,229,255,0.35);box-shadow:0 0 0 1px rgba(0,229,255,0.15);}
+.mc.mock-data:hover{border-color:rgba(0,229,255,0.6);}
+.mock-badge{position:absolute;top:8px;right:8px;z-index:3;
+  background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.3);
+  color:#00e5ff;font-size:8.5px;font-family:var(--fm);font-weight:600;
+  letter-spacing:0.07em;text-transform:uppercase;
+  padding:2px 6px;border-radius:3px;pointer-events:none;}
+/* R23: Mock fixture rows */
+.fixr.mock-data{border-color:rgba(0,229,255,0.25);}
+/* R23: Mock tournament card */
+.tc.mock-data{border-color:rgba(0,229,255,0.3);}
+.tc.mock-data .t-card-hdr-mock{display:block;}
+/* R23: Mock bracket match */
+.bm.mock-data{border-color:rgba(0,229,255,0.25);border-width:1px;border-style:solid;}
 .ct{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;}
 .ci{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;
   justify-content:center;font-size:13px;flex-shrink:0;}
@@ -685,6 +700,12 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
           <select class="ss-sel" onchange="sortM(this.value)"><option value="vol">Volume ↓</option><option value="yes">YES% ↓</option><option value="close">Closing Soon</option></select>
         </div>
         <div class="mg" id="mkG"></div>
+        <div id="mockLegend" style="display:none;padding:0 26px 20px;">
+          <div style="display:inline-flex;align-items:center;gap:7px;background:rgba(0,229,255,0.07);border:1px solid rgba(0,229,255,0.25);border-radius:6px;padding:6px 12px;">
+            <div style="width:10px;height:10px;border-radius:2px;border:1.5px solid rgba(0,229,255,0.6);flex-shrink:0;"></div>
+            <span style="font-size:11px;color:rgba(0,229,255,0.8);">Cyan border = Mock data · Engine loading live prices from Yahoo Finance / Binance</span>
+          </div>
+        </div>
       </div>
       <div id="tab-spt" style="display:none;"><div class="ts" id="tSec"></div></div>
     </div>
@@ -896,18 +917,31 @@ const MOCK_TOURNAMENTS = [
    seasonWinner:[{team:'Bayern Munich',prob:61,color:'#DC052D'},{team:'Leverkusen',prob:24,color:'#E32221'},{team:'Dortmund',prob:15,color:'#FDE100'}],
    fixtures:[{home:'Bayern Munich',away:'Stuttgart',homeProb:79,date:'May 18',status:'open'}]},
   {id:'uefa_champions_league',name:'Champions League',short_name:'UCL',flag:'🇪🇺',icon:'🏆',sport:'football',type:'bracket',active:true,status:'Semi Finals',activeMarkets:2,
-   bracket:[{round:'Semi Finals',matches:[{home:'Real Madrid',away:'Bayern Munich',homeProb:56,date:'May 8',status:'open'},{home:'Arsenal',away:'PSG',homeProb:48,date:'May 8',status:'open'}]},{round:'Final',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'Jun 1',status:'pending'}]}]},
-  {id:'fifa_world_cup',name:'FIFA World Cup',short_name:'World Cup',flag:'🌍',icon:'🏆',sport:'football',type:'bracket',active:true,status:'2026 — Group Stage draw pending',activeMarkets:0,
-   bracket:[{round:'Group Stage',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'Jun 2026',status:'pending'}]}]},
+   bracket:[{round:'Semi Finals',matches:[{home:'Real Madrid',away:'Bayern Munich',homeProb:56,date:'2026-05-08',status:'open'},{home:'Arsenal',away:'PSG',homeProb:48,date:'2026-05-08',status:'open'}]},{round:'Final',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-06-01',status:'pending'}]}]},
+  {id:'fifa_world_cup',name:'FIFA World Cup 2026',short_name:'World Cup',flag:'🌍',icon:'🏆',sport:'football',type:'bracket',active:true,status:'Group Stage — starts Jun 11',activeMarkets:24,
+   bracket:[{round:'Round of 32',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-06-28',status:'pending'}]}],
+   groupFixtures:{
+     'A':[{homeTeam:'Mexico',awayTeam:'South Africa',yes:62,closes:'Jun 11',suspendReason:null,suspended:false,resolved:false,id:'wc_mex_rsa',group:'A'},{homeTeam:'South Korea',awayTeam:'Czechia',yes:55,closes:'Jun 11',suspended:false,resolved:false,id:'wc_kor_cze',group:'A'}],
+     'B':[{homeTeam:'Canada',awayTeam:'Bosnia',yes:54,closes:'Jun 12',suspended:false,resolved:false,id:'wc_can_bih',group:'B'},{homeTeam:'Qatar',awayTeam:'Switzerland',yes:34,closes:'Jun 13',suspended:false,resolved:false,id:'wc_qat_sui',group:'B'}],
+     'C':[{homeTeam:'Brazil',awayTeam:'Morocco',yes:61,closes:'Jun 13',suspended:false,resolved:false,id:'wc_bra_mar',group:'C'},{homeTeam:'Haiti',awayTeam:'Scotland',yes:38,closes:'Jun 13',suspended:false,resolved:false,id:'wc_hai_sco',group:'C'}],
+     'D':[{homeTeam:'USA',awayTeam:'Paraguay',yes:58,closes:'Jun 12',suspended:false,resolved:false,id:'wc_usa_par',group:'D'},{homeTeam:'Australia',awayTeam:'Turkiye',yes:48,closes:'Jun 13',suspended:false,resolved:false,id:'wc_aus_tur',group:'D'}],
+     'E':[{homeTeam:'Germany',awayTeam:'Curacao',yes:88,closes:'Jun 14',suspended:false,resolved:false,id:'wc_ger_cur',group:'E'},{homeTeam:'Ivory Coast',awayTeam:'Ecuador',yes:47,closes:'Jun 16',suspended:false,resolved:false,id:'wc_civ_ecu',group:'E'}],
+     'F':[{homeTeam:'Netherlands',awayTeam:'Japan',yes:58,closes:'Jun 14',suspended:false,resolved:false,id:'wc_ned_jpn',group:'F'},{homeTeam:'Sweden',awayTeam:'Tunisia',yes:61,closes:'Jun 16',suspended:false,resolved:false,id:'wc_swe_tun',group:'F'}],
+     'G':[{homeTeam:'Belgium',awayTeam:'Egypt',yes:62,closes:'Jun 15',suspended:false,resolved:false,id:'wc_bel_egy',group:'G'},{homeTeam:'New Zealand',awayTeam:'Iran',yes:44,closes:'Jun 16',suspended:false,resolved:false,id:'wc_nzl_irn',group:'G'}],
+     'H':[{homeTeam:'Spain',awayTeam:'Cape Verde',yes:84,closes:'Jun 15',suspended:false,resolved:false,id:'wc_esp_cpv',group:'H'},{homeTeam:'Uruguay',awayTeam:'Saudi Arabia',yes:64,closes:'Jun 17',suspended:false,resolved:false,id:'wc_uru_ksa',group:'H'}],
+     'I':[{homeTeam:'France',awayTeam:'Senegal',yes:63,closes:'Jun 15',suspended:false,resolved:false,id:'wc_fra_sen',group:'I'},{homeTeam:'Norway',awayTeam:'Iraq',yes:68,closes:'Jun 16',suspended:false,resolved:false,id:'wc_nor_irq',group:'I'}],
+     'J':[{homeTeam:'Argentina',awayTeam:'Algeria',yes:74,closes:'Jun 15',suspended:false,resolved:false,id:'wc_arg_alg',group:'J'},{homeTeam:'Austria',awayTeam:'Jordan',yes:62,closes:'Jun 17',suspended:false,resolved:false,id:'wc_aut_jor',group:'J'}],
+     'K':[{homeTeam:'Portugal',awayTeam:'DR Congo',yes:71,closes:'Jun 15',suspended:false,resolved:false,id:'wc_por_cod',group:'K'},{homeTeam:'Colombia',awayTeam:'Uzbekistan',yes:64,closes:'Jun 17',suspended:false,resolved:false,id:'wc_col_uzb',group:'K'}],
+     'L':[{homeTeam:'England',awayTeam:'Croatia',yes:64,closes:'Jun 14',suspended:false,resolved:false,id:'wc_eng_cro',group:'L'},{homeTeam:'Ghana',awayTeam:'Panama',yes:54,closes:'Jun 17',suspended:false,resolved:false,id:'wc_gha_pan',group:'L'}],
+   }},
   {id:'tennis_french_open',name:'Roland Garros',short_name:'French Open',flag:'🇫🇷',icon:'🎾',sport:'tennis',type:'bracket',active:true,surface:'Clay',status:'Semi Finals',activeMarkets:4,
-   bracket:[{round:'Semi Finals',matches:[{home:'Alcaraz',away:'Djokovic',homeProb:54,date:'Jun 6',status:'open'},{home:'Sinner',away:'Ruud',homeProb:63,date:'Jun 6',status:'open'}]},{round:'Final',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'Jun 8',status:'pending'}]}]},
+   bracket:[{round:'Semi Finals',matches:[{home:'Alcaraz',away:'Djokovic',homeProb:54,date:'2026-06-06',status:'open'},{home:'Sinner',away:'Ruud',homeProb:63,date:'2026-06-06',status:'open'}]},{round:'Final',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-06-08',status:'pending'}]}]},
   {id:'tennis_wimbledon',name:'Wimbledon',short_name:'Wimbledon',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',icon:'🎾',sport:'tennis',type:'bracket',active:true,surface:'Grass',status:'Opens July 2026',activeMarkets:0,
-   bracket:[{round:'First Round',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'Jul 2026',status:'pending'}]}]},
+   bracket:[{round:'First Round',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-07-01',status:'pending'}]}]},
   {id:'tennis_us_open',name:'US Open',short_name:'US Open',flag:'🇺🇸',icon:'🎾',sport:'tennis',type:'bracket',active:true,surface:'Hard',status:'Opens August 2026',activeMarkets:0,
    bracket:[]},
-  {id:'golf_the_masters',name:'The Masters',short_name:'Masters',flag:'🇺🇸',icon:'⛳',sport:'golf',type:'leaderboard',active:false,status:'Concluded — next April 2027',activeMarkets:0,bracket:[]},
-  {id:'golf_us_open',name:'US Open Golf',short_name:'US Open',flag:'🇺🇸',icon:'⛳',sport:'golf',type:'leaderboard',active:true,status:'Jun 12-15 2026',activeMarkets:3,
-   bracket:[{round:'Tournament',matches:[{home:'Scheffler',away:'Rory McIlroy',homeProb:38,date:'Jun 12',status:'open'},{home:'Jon Rahm',away:'Viktor Hovland',homeProb:44,date:'Jun 12',status:'open'}]}]},
+  {id:'golf_the_masters',name:'The Masters',short_name:'Masters',flag:'🇺🇸',icon:'⛳',sport:'golf',type:'leaderboard',active:false,coming_soon:true,status:'Concluded — next April 2027',activeMarkets:0,bracket:[]},
+  {id:'golf_us_open',name:'US Open Golf',short_name:'US Open',flag:'🇺🇸',icon:'⛳',sport:'golf',type:'leaderboard',active:true,coming_soon:true,status:'Jun 12-15 2026 · Coming Soon',activeMarkets:0,bracket:[]},
 ];
 
 const MOCK_TRADERS = [
@@ -947,6 +981,16 @@ try { const t = localStorage.getItem('bidness_trades'); if (t) S.trades = JSON.p
 const fmt = n => isNaN(n) ? '0.00' : n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtK = n => n>=1e6 ? '$'+(n/1e6).toFixed(1)+'M' : n>=1e3 ? '$'+(n/1e3).toFixed(0)+'K' : '$'+n;
 const el = id => document.getElementById(id);
+// R4: UTC internally, local time displayed
+function fmtDate(isoOrStr) {
+  if (!isoOrStr||isoOrStr==='TBD') return 'TBD';
+  if (window.BidnessEngine?.formatLocalDate) return window.BidnessEngine.formatLocalDate(isoOrStr);
+  try {
+    const d = new Date(isoOrStr);
+    if (isNaN(d)) return isoOrStr;
+    return d.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+  } catch { return isoOrStr; }
+}
 function saveState() {
   try {
     localStorage.setItem('bidness_balance', String(S.bal));
@@ -1001,11 +1045,15 @@ function mkSpark(canvas, yes, history) {
 // ═══════════════════════════════════════════
 function rendMkts(list) {
   const g = el('mkG'); g.innerHTML='';
+  // R23: a market is mock if engine isn't ready OR dataSource is not a live source
+  const liveSources = ['yahoo','stooq','binance','coingecko'];
   list.forEach(m => {
     const cc = CAT_C[m.cat]||CAT_C.Finance;
+    const isMock = !window.BidnessEngine.ready || !m.dataSource || !liveSources.includes(m.dataSource);
     const div = document.createElement('div');
-    div.className = 'mc'+(m.suspended?' susp':'');
+    div.className = 'mc'+(m.suspended?' susp':'')+(isMock?' mock-data':'');
     div.innerHTML = `
+      ${isMock ? '<div class="mock-badge">Mock Data</div>' : ''}
       <div class="du" id="data-ind-${m.ticker}"><div class="dud"></div>updating...</div>
       <div class="ct">
         <div class="ci" style="background:${cc.ic}">${m.icon}</div>
@@ -1036,6 +1084,10 @@ function rendMkts(list) {
   el('omStat').textContent = list.length;
   el('omSub').textContent = '↑ '+ Math.max(1,Math.floor(list.length*0.025)) +' new today';
   el('finCnt').textContent = list.length;
+  // R23: show legend if any mock cards visible
+  const hasMock = list.some(m => !window.BidnessEngine.ready || !m.dataSource);
+  const legend = el('mockLegend');
+  if (legend) legend.style.display = hasMock ? 'block' : 'none';
 }
 
 function getFilt() {
@@ -1103,11 +1155,20 @@ function togSG(hdr) {
 
 function mkTCard(t) {
   const statC=t.activeMarkets>0?'background:var(--yes-dim);color:var(--yes)':'background:var(--bg4);color:var(--text3)';
-  return `<div class="tc" id="tc-${t.id}">
+  // R23: mock if engine not ready OR all markets for this tournament are config-sourced (not ESPN)
+  const tMkts = window.BidnessEngine.getSportsMarkets().filter(m=>m.tournamentId===t.id);
+  const isMock = !window.BidnessEngine.ready ||
+    tMkts.length===0 ||
+    tMkts.every(m=>m.dataSource==='config'||m.dataSource==='loading'||!m.dataSource);
+  const mockClass = isMock && !t.coming_soon ? ' mock-data' : '';
+  const mockTag = isMock && !t.coming_soon
+    ? `<span style="font-size:8.5px;font-family:var(--fm);font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#00e5ff;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.25);padding:1px 5px;border-radius:3px;margin-left:6px;">Mock</span>`
+    : '';
+  return `<div class="tc${mockClass}" id="tc-${t.id}">
     <div class="tch" onclick="togTC('${t.id}')">
       <div class="tf">${t.flag}</div>
       <div class="ti">
-        <div class="tn">${t.name}</div>
+        <div class="tn">${t.name}${mockTag}</div>
         <div class="tm"><span>${t.sport}</span><span>·</span><span>${t.status||'Active'}</span>${t.surface?`<span>· ${t.surface}</span>`:''}</div>
       </div>
       <div class="tmb" style="${statC}">${t.activeMarkets} market${t.activeMarkets!==1?'s':''}</div>
@@ -1125,7 +1186,34 @@ function togTC(id) {
 }
 
 function mkTBody(t) {
-  if(t.type==='league') {
+
+  // ── Golf coming soon placeholder ──────────────────
+  if (t.coming_soon || t.sport==='golf') {
+    return `<div style="padding:20px;text-align:center;">
+      <div style="font-size:28px;margin-bottom:8px;">⛳</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:5px;">Golf Markets — Coming Soon</div>
+      <div style="font-size:11.5px;color:var(--text3);line-height:1.6;">OWGR probability model in development.<br>Course history, strokes gained, and cut-line markets will launch with the US Open.</div>
+    </div>`;
+  }
+
+  // ── R6: live score display helper ─────────────────
+  function liveScoreBadge(f) {
+    if (!f.liveScore) return '';
+    return `<span style="font-family:var(--fm);font-size:10px;color:var(--warn);margin-left:6px;background:var(--warn-dim);padding:1px 5px;border-radius:3px;">
+      🔴 ${f.liveScore.homeScore} – ${f.liveScore.awayScore}
+    </span>`;
+  }
+
+  // ── R6: pending result badge ───────────────────────
+  function suspendBadge(f) {
+    if (!f.status || f.status==='open') return '';
+    if (f.status==='in_progress') return `<span style="font-size:9.5px;background:var(--warn-dim);color:var(--warn);padding:1px 6px;border-radius:3px;font-weight:600;margin-left:4px;">LIVE</span>`;
+    if (f.status==='result_pending') return `<span style="font-size:9.5px;background:var(--gold-dim);color:var(--gold);padding:1px 6px;border-radius:3px;font-weight:600;margin-left:4px;">RESULT PENDING</span>`;
+    return '';
+  }
+
+  // ── LEAGUE ───────────────────────────────────────
+  if (t.type==='league') {
     const swRows=(t.seasonWinner||[]).map(r=>`
       <div class="swr">
         <div class="swn">${r.team}</div>
@@ -1133,58 +1221,131 @@ function mkTBody(t) {
         <div class="swp">${r.prob}%</div>
         <button class="swbtn" onclick="openTrdSport('${t.id}-sw-${r.team.replace(/ /g,'_')}','${r.team}','WIN','${t.name}')">Trade</button>
       </div>`).join('');
-    const fixRows=(t.fixtures||[]).map(f=>`
-      <div class="fixr">
-        <div class="fixteams"><span>${f.home}</span><span class="fixvs">vs</span><span>${f.away}</span></div>
+
+    // R14: Use live engine markets if available, else config fixtures
+    const liveMkts = window.BidnessEngine.getSportsMarkets().filter(m=>m.tournamentId===t.id&&!m.resolved);
+    const fixSource = liveMkts.length ? liveMkts.map(m=>({
+      home:m.homeTeam, away:m.awayTeam, homeProb:m.yes,
+      date:m.closes, status:m.suspended?(m.suspendReason==='result_pending'?'result_pending':'in_progress'):'open',
+      liveScore:m.liveScore||null, id:m.id,
+    })) : (t.fixtures||[]);
+
+    const fixRows = fixSource.map(f=>`
+      <div class="fixr" style="${f.status!=='open'?'opacity:0.8':''}">
+        <div class="fixteams">
+          <span>${f.home}</span><span class="fixvs">vs</span><span>${f.away}</span>
+          ${liveScoreBadge(f)}${suspendBadge(f)}
+        </div>
         <div class="fixp">${f.homeProb}%</div>
         <div class="fixd">${f.date}</div>
-        <button class="fy" onclick="openTrdSport('${t.id}-${f.home.replace(/ /g,'_')}','${f.home}','YES','${t.name}')">YES</button>
-        <button class="fn" onclick="openTrdSport('${t.id}-${f.home.replace(/ /g,'_')}','${f.home}','NO','${t.name}')">NO</button>
-      </div>`).join('') || '<div style="padding:10px;font-size:11.5px;color:var(--text3);">No upcoming fixtures</div>';
+        ${f.status==='open'
+          ? `<button class="fy" onclick="openTrdSport('${f.id||t.id+'-'+f.home.replace(/ /g,'_')}','${f.home}','YES','${t.name}')">YES</button>
+             <button class="fn" onclick="openTrdSport('${f.id||t.id+'-'+f.home.replace(/ /g,'_')}','${f.home}','NO','${t.name}')">NO</button>`
+          : `<span style="font-size:10px;color:var(--text3);margin-left:4px;">🔒 Suspended</span>`}
+      </div>`).join('') || '<div style="padding:10px;font-size:11.5px;color:var(--text3);">No upcoming fixtures — checking ESPN...</div>';
+
     return `<div class="tstabs">
       <button class="tstab active" onclick="tStab('${t.id}',0,this)">Season Winner</button>
-      <button class="tstab" onclick="tStab('${t.id}',1,this)">Fixtures</button>
+      <button class="tstab" onclick="tStab('${t.id}',1,this)">Fixtures <span style="font-size:9.5px;font-family:var(--fm);background:var(--bg4);padding:1px 4px;border-radius:2px;">${fixSource.length}</span></button>
     </div>
     <div class="tcon">
-      <div id="ts-${t.id}-0"><div class="swc"><div class="swt">Season winner probability</div><div>${swRows}</div></div></div>
+      <div id="ts-${t.id}-0"><div class="swc"><div class="swt">Season winner probability — Weighted Elo model</div><div>${swRows}</div></div></div>
       <div id="ts-${t.id}-1" style="display:none;"><div class="fl">${fixRows}</div></div>
     </div>`;
   }
-  if(t.type==='bracket'||t.type==='leaderboard') {
-    const bracketHTML = (t.bracket&&t.bracket.length)
-      ? `<div class="bw"><div class="bk">${(t.bracket||[]).map(r=>`
-          <div class="br">
-            <div class="brt">${r.round}</div>
-            ${r.matches.map(m=>`
-              <div class="bm">
-                <div class="bmt ${m.status==='resolved'&&m.winner===m.home?'win':m.home==='TBD'?'tbd':''}">${m.home} <span class="bmp">${m.homeProb}%</span></div>
-                <div class="bsep"></div>
-                <div class="bmt ${m.status==='resolved'&&m.winner===m.away?'win':m.away==='TBD'?'tbd':''}">${m.away} <span class="bmp">${100-m.homeProb}%</span></div>
-                ${m.status==='open'?`<div class="bmb">
-                  <button class="bby" onclick="openTrdSport('${t.id}-${m.home.replace(/ /g,'_')}','${m.home}','YES','${t.name}')">YES</button>
-                  <button class="bbn" onclick="openTrdSport('${t.id}-${m.home.replace(/ /g,'_')}','${m.home}','NO','${t.name}')">NO</button>
-                </div>`:''}
+
+  // ── BRACKET (football knockout + tennis) ─────────
+  if (t.type==='bracket') {
+
+    // R12: World Cup — group stage view grouped by group letter
+    if (t.groupFixtures && Object.keys(t.groupFixtures).length) {
+      const groups = t.groupFixtures;
+      const groupKeys = Object.keys(groups).sort();
+      const groupsHTML = groupKeys.map(g => `
+        <div style="margin-bottom:14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;padding:0 2px;">Group ${g}</div>
+          <div class="fl">
+            ${groups[g].slice(0,3).map(m=>`
+              <div class="fixr" style="${m.suspended?'opacity:0.8':''}">
+                <div class="fixteams">
+                  <span>${m.homeTeam}</span><span class="fixvs">vs</span><span>${m.awayTeam}</span>
+                  ${m.suspended&&m.liveScore?`<span style="font-family:var(--fm);font-size:10px;color:var(--warn);margin-left:6px;background:var(--warn-dim);padding:1px 5px;border-radius:3px;">🔴 ${m.liveScore.homeScore}–${m.liveScore.awayScore}</span>`:''}
+                </div>
+                <div class="fixp">${m.yes}%</div>
+                <div class="fixd">${m.closes}</div>
+                ${!m.suspended&&!m.resolved
+                  ? `<button class="fy" onclick="openTrdSport('${m.id}','${m.homeTeam}','YES','${t.name}')">YES</button>
+                     <button class="fn" onclick="openTrdSport('${m.id}','${m.homeTeam}','NO','${t.name}')">NO</button>`
+                  : m.resolved
+                    ? `<span style="font-size:10px;color:var(--yes);font-family:var(--fm);">✓ ${m.result}</span>`
+                    : `<span style="font-size:9.5px;color:var(--warn);background:var(--warn-dim);padding:1px 5px;border-radius:3px;">LIVE</span>`}
               </div>`).join('')}
-          </div>`).join('')}</div></div>`
-      : `<div style="padding:10px;font-size:11.5px;color:var(--text3);">No active matches at this time</div>`;
-    const mktsHTML = (t.bracket||[]).flatMap(r=>r.matches).filter(m=>m.status==='open'&&m.home!=='TBD')
-      .map(m=>`<div class="fixr">
-        <div class="fixteams"><span>${m.home}</span><span class="fixvs">vs</span><span>${m.away}</span></div>
-        <div class="fixp">${m.homeProb}%</div>
-        <div class="fixd">${m.date||''}</div>
-        <button class="fy" onclick="openTrdSport('${t.id}-${m.home.replace(/ /g,'_')}','${m.home}','YES','${t.name}')">YES</button>
-        <button class="fn" onclick="openTrdSport('${t.id}-${m.home.replace(/ /g,'_')}','${m.home}','NO','${t.name}')">NO</button>
-      </div>`).join('') || '<div style="padding:10px;font-size:11.5px;color:var(--text3);">No open markets</div>';
+          </div>
+        </div>`).join('');
+
+      const bracketHTML = (t.bracket&&t.bracket.length)
+        ? mkBracketHTML(t)
+        : '<div style="padding:10px;font-size:11.5px;color:var(--text3);">Knockout bracket — available after group stage</div>';
+
+      return `<div class="tstabs">
+        <button class="tstab active" onclick="tStab('${t.id}',0,this)">Group Stage</button>
+        <button class="tstab" onclick="tStab('${t.id}',1,this)">Knockout</button>
+        <button class="tstab" onclick="tStab('${t.id}',2,this)">All Markets</button>
+      </div>
+      <div class="tcon">
+        <div id="ts-${t.id}-0" style="max-height:480px;overflow-y:auto;">${groupsHTML}</div>
+        <div id="ts-${t.id}-1" style="display:none;">${bracketHTML}</div>
+        <div id="ts-${t.id}-2" style="display:none;">${mkAllMarketsHTML(t)}</div>
+      </div>`;
+    }
+
+    // Standard bracket (UCL, tennis etc)
     return `<div class="tstabs">
       <button class="tstab active" onclick="tStab('${t.id}',0,this)">Bracket</button>
       <button class="tstab" onclick="tStab('${t.id}',1,this)">Markets</button>
     </div>
     <div class="tcon">
-      <div id="ts-${t.id}-0">${bracketHTML}</div>
-      <div id="ts-${t.id}-1" style="display:none;"><div class="fl">${mktsHTML}</div></div>
+      <div id="ts-${t.id}-0">${mkBracketHTML(t)}</div>
+      <div id="ts-${t.id}-1" style="display:none;">${mkAllMarketsHTML(t)}</div>
     </div>`;
   }
+
   return '<div style="padding:10px;font-size:11.5px;color:var(--text3);">No markets available</div>';
+}
+
+function mkBracketHTML(t) {
+  if (!t.bracket||!t.bracket.length) return '<div style="padding:10px;font-size:11.5px;color:var(--text3);">No bracket data yet</div>';
+  return `<div class="bw"><div class="bk">${t.bracket.map(r=>`
+    <div class="br">
+      <div class="brt">${r.round}</div>
+      ${r.matches.map(m=>`
+        <div class="bm">
+          <div class="bmt ${m.status==='resolved'&&m.winner===m.home?'win':m.home==='TBD'?'tbd':''}">${m.home} <span class="bmp">${m.homeProb||'—'}%</span></div>
+          <div class="bsep"></div>
+          <div class="bmt ${m.status==='resolved'&&m.winner===m.away?'win':m.away==='TBD'?'tbd':''}">${m.away} <span class="bmp">${m.homeProb?100-m.homeProb:'—'}%</span></div>
+          ${m.status==='open'&&m.home!=='TBD'?`<div class="bmb">
+            <button class="bby" onclick="openTrdSport('${t.id}-${m.home.replace(/ /g,'_')}','${m.home}','YES','${t.name}')">YES</button>
+            <button class="bbn" onclick="openTrdSport('${t.id}-${m.home.replace(/ /g,'_')}','${m.home}','NO','${t.name}')">NO</button>
+          </div>`:''}
+          ${m.status==='in_progress'?`<div style="margin-top:4px;font-size:9.5px;color:var(--warn);text-align:center;">🔴 LIVE</div>`:''}
+          ${m.status==='result_pending'?`<div style="margin-top:4px;font-size:9.5px;color:var(--gold);text-align:center;">⏳ Result pending</div>`:''}
+        </div>`).join('')}
+    </div>`).join('')}</div></div>`;
+}
+
+function mkAllMarketsHTML(t) {
+  const liveMkts = window.BidnessEngine.getSportsMarkets().filter(m=>m.tournamentId===t.id&&!m.resolved);
+  if (!liveMkts.length) return '<div style="padding:10px;font-size:11.5px;color:var(--text3);">No open markets</div>';
+  return `<div class="fl">${liveMkts.slice(0,12).map(m=>`
+    <div class="fixr" style="${m.suspended?'opacity:0.8':''}">
+      <div class="fixteams"><span>${m.homeTeam}</span><span class="fixvs">vs</span><span>${m.awayTeam}</span>${m.group?`<span style="font-size:9px;color:var(--text3);margin-left:5px;">Grp ${m.group}</span>`:''}</div>
+      <div class="fixp">${m.yes}%</div>
+      <div class="fixd">${m.closes}</div>
+      ${!m.suspended
+        ? `<button class="fy" onclick="openTrd('${m.id}','YES')">YES</button>
+           <button class="fn" onclick="openTrd('${m.id}','NO')">NO</button>`
+        : `<span style="font-size:9.5px;color:var(--warn);background:var(--warn-dim);padding:1px 5px;border-radius:3px;">${m.suspendReason==='result_pending'?'⏳ PENDING':'🔴 LIVE'}</span>`}
+    </div>`).join('')}</div>`;
 }
 
 function tStab(tid, idx, btn) {
@@ -1600,9 +1761,13 @@ window.addEventListener('bidness:ready', e => {
   rendTournaments();
   const src = e.detail.dataSource;
   el('dStV').textContent = src==='live'?'Live':'Mock';
-  el('dStS').textContent = src==='live'?'Yahoo · Binance · ESPN':'Demo data · engine.js loading';
+  el('dStS').textContent = src==='live'?'Yahoo · Binance · ESPN · club-elo.com':'Demo data';
   el('actDSrc').textContent = src==='live'?'Yahoo · Binance · ESPN':'Mock data';
-  if(src==='live') toast('✅','Live data loaded!',`${e.detail.marketCount} financial markets · ESPN polling active`);
+  const sptCnt = e.detail.sportsCount || 0;
+  el('sptCnt').textContent = sptCnt;
+  el('actMktCnt').textContent = (e.detail.marketCount||0) + sptCnt;
+  if(src==='live') toast('✅','Live data loaded!',`${e.detail.marketCount} financial · ${sptCnt} sports markets · Elo probabilities active`);
+  else toast('ℹ️','Demo mode','engine.js running · Fetching live data from Yahoo/Binance/ESPN...');
 });
 window.addEventListener('bidness:markets_updated', e => {
   rendMkts(getFilt());
