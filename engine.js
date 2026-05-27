@@ -16,9 +16,12 @@
   // ─────────────────────────────────────────────
   // CONSTANTS
   // ─────────────────────────────────────────────
-  const ESPN_BASE   = 'https://site.api.espn.com/apis/site/v2/sports';
-  const YAHOO_BASE  = 'https://query1.finance.yahoo.com/v8/finance/chart';
-  const STOOQ_BASE  = 'https://stooq.com/q/d/l';
+  // CORS proxy — required for GitHub Pages browser requests (R1: free, no key)
+  // corsproxy.io is free and requires no API key. Falls back to direct if proxy fails.
+  const CORS        = 'https://corsproxy.io/?';
+  const ESPN_BASE   = CORS + encodeURIComponent('https://site.api.espn.com/apis/site/v2/sports');
+  const YAHOO_BASE  = CORS + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart');
+  const STOOQ_BASE  = CORS + encodeURIComponent('https://stooq.com/q/d/l');
   const BINANCE_BASE= 'https://api.binance.com/api/v3/klines';
   const GECKO_BASE  = 'https://api.coingecko.com/api/v3/coins';
   const TSDB_BASE   = 'https://www.thesportsdb.com/api/v1/json/3';
@@ -148,7 +151,8 @@
 
   /** Fetch 252 daily closes from Yahoo Finance (R1 — free, cors=true) */
   async function fetchYahoo(ticker) {
-    const url = `${YAHOO_BASE}/${encodeURIComponent(ticker)}?interval=1d&range=1y&cors=true`;
+    const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1y&cors=true`;
+    const url = CORS + encodeURIComponent(rawUrl);
     const data = await safeFetch(url, 10000);
     const result = data?.chart?.result?.[0];
     if (!result) throw new Error('No Yahoo data for ' + ticker);
@@ -161,7 +165,8 @@
   async function fetchStooq(ticker) {
     const map = E.config?.stooq_ticker_map || {};
     const stooqTicker = map[ticker] || (ticker.toLowerCase() + '.us');
-    const url = `${STOOQ_BASE}/?s=${stooqTicker}&i=d`;
+    const rawStooqUrl = `https://stooq.com/q/d/l/?s=${stooqTicker}&i=d`;
+    const url = CORS + encodeURIComponent(rawStooqUrl);
     const res = await fetch(url);
     const text = await res.text();
     const lines = text.trim().split('\n').slice(1); // skip header
@@ -544,13 +549,15 @@
 
   /** Fetch ESPN scoreboard for a sport/league */
   async function fetchESPN(sport, league) {
-    const url = `${ESPN_BASE}/${sport}/${league}/scoreboard`;
+    const rawUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`;
+    const url = CORS + encodeURIComponent(rawUrl);
     return await safeFetch(url, 8000);
   }
 
   /** Fetch ESPN standings for a sport/league */
   async function fetchESPNStandings(sport, league) {
-    const url = `${ESPN_BASE}/${sport}/${league}/standings`;
+    const rawUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/standings`;
+    const url = CORS + encodeURIComponent(rawUrl);
     return await safeFetch(url, 8000);
   }
 
