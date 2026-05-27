@@ -1,0 +1,826 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Bidness.ai tournament registry. Edit this file directly on GitHub to add or remove tournaments. No code changes required.",
+    "last_updated": "2026-05-27",
+    "admin_instructions": "To add a tournament: copy any existing block, change the id and fields, set active to true. To disable a tournament without removing it: set active to false. ESPN league slugs can be found at site.api.espn.com/apis/site/v2/sports/"
+  },
+
+  "tournaments": [
+
+    {
+      "id": "eng_premier_league",
+      "name": "English Premier League",
+      "short_name": "Premier League",
+      "sport": "football",
+      "type": "league",
+      "country": "England",
+      "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+      "icon": "⚽",
+      "active": true,
+      "espn_sport": "soccer",
+      "espn_league": "eng.1",
+      "thesportsdb_league_id": "4328",
+      "season_start_month": 8,
+      "season_end_month": 5,
+      "markets": {
+        "season_winner": true,
+        "per_match": true,
+        "top_4_finish": true,
+        "relegation": true
+      },
+      "model": "football_league",
+      "notes": "Top flight English football. 20 teams, 38 matchdays."
+    },
+
+    {
+      "id": "sco_premiership",
+      "name": "Scottish Premiership",
+      "short_name": "Scottish Prem",
+      "sport": "football",
+      "type": "league",
+      "country": "Scotland",
+      "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+      "icon": "⚽",
+      "active": true,
+      "espn_sport": "soccer",
+      "espn_league": "sco.1",
+      "thesportsdb_league_id": "4330",
+      "season_start_month": 8,
+      "season_end_month": 5,
+      "markets": {
+        "season_winner": true,
+        "per_match": true,
+        "top_6_finish": true,
+        "relegation": true
+      },
+      "model": "football_league",
+      "notes": "Top flight Scottish football. 12 teams."
+    },
+
+    {
+      "id": "fra_ligue1",
+      "name": "Ligue 1",
+      "short_name": "Ligue 1",
+      "sport": "football",
+      "type": "league",
+      "country": "France",
+      "flag": "🇫🇷",
+      "icon": "⚽",
+      "active": true,
+      "espn_sport": "soccer",
+      "espn_league": "fra.1",
+      "thesportsdb_league_id": "4334",
+      "season_start_month": 8,
+      "season_end_month": 5,
+      "markets": {
+        "season_winner": true,
+        "per_match": true,
+        "top_3_finish": true,
+        "relegation": true
+      },
+      "model": "football_league",
+      "notes": "Top flight French football. 18 teams."
+    },
+
+    {
+      "id": "esp_laliga",
+      "name": "La Liga",
+      "short_name": "La Liga",
+      "sport": "football",
+      "type": "league",
+      "country": "Spain",
+      "flag": "🇪🇸",
+      "icon": "⚽",
+      "active": true,
+      "espn_sport": "soccer",
+      "espn_league": "esp.1",
+      "thesportsdb_league_id": "4335",
+      "season_start_month": 8,
+      "season_end_month": 5,
+      "markets": {
+        "season_winner": true,
+        "per_match": true,
+        "top_4_finish": true,
+        "relegation": true
+      },
+      "model": "football_league",
+      "notes": "Top flight Spanish football. 20 teams."
+    },
+
+    {
+      "id": "ita_seriea",
+      "name": "Serie A",
+      "short_name": "Serie A",
+      "sport": "football",
+      "type": "league",
+      "country": "Italy",
+      "flag": "🇮🇹",
+      "icon": "⚽",
+      "active": true,
+      "espn_sport": "soccer",
+      "espn_league": "ita.1",
+      "thesportsdb_league_id": "4332",
+      "season_start_month": 8,
+      "season_end_month": 5,
+      "markets": {
+        "season_winner": true,
+        "per_match": true,
+        "top_4_finish": true,
+        "relegation": true
+      },
+      "model": "football_league",
+      "notes": "Top flight Italian football. 20 teams."
+    },
+
+    {
+      "id": "ger_bundesliga",
+      "name": "Bundesliga",
+      "short_name": "Bundesliga",
+      "sport": "football",
+      "type": "league",
+      "country": "Germany",
+      "flag": "🇩🇪",
+      "icon": "⚽",
+      "active": true,
+      "espn_sport": "soccer",
+      "espn_league": "ger.1",
+      "thesportsdb_league_id": "4331",
+      "season_start_month": 8,
+      "season_end_month": 5,
+      "markets": {
+        "season_winner": true,
+        "per_match": true,
+        "top_4_finish": true,
+        "relegation": true
+      },
+      "model": "football_league",
+      "notes": "Top flight German football. 18 teams."
+    },
+
+    {
+      "id": "uefa_champions_league",
+      "name": "UEFA Champions League",
+      "short_name": "Champions League",
+      "sport": "football",
+      "type": "bracket",
+      "country": "Europe",
+      "flag": "🇪🇺",
+      "icon": "🏆",
+      "active": true,
+      "espn_sport": "soccer",
+      "espn_league": "uefa.champions",
+      "thesportsdb_league_id": "4480",
+      "rounds": [
+        "League Phase",
+        "Round of 16",
+        "Quarter Final",
+        "Semi Final",
+        "Final"
+      ],
+      "final_month": 6,
+      "markets": {
+        "per_match": true,
+        "tournament_winner": true,
+        "reach_final": true
+      },
+      "auto_advance": true,
+      "model": "football_knockout",
+      "notes": "UEFA Champions League. Auto-advances bracket on result."
+    },
+
+    {
+      "id": "uefa_europa_league",
+      "name": "UEFA Europa League",
+      "short_name": "Europa League",
+      "sport": "football",
+      "type": "bracket",
+      "country": "Europe",
+      "flag": "🇪🇺",
+      "icon": "🏅",
+      "active": true,
+      "espn_sport": "soccer",
+      "espn_league": "uefa.europa",
+      "thesportsdb_league_id": "4481",
+      "rounds": [
+        "League Phase",
+        "Round of 16",
+        "Quarter Final",
+        "Semi Final",
+        "Final"
+      ],
+      "final_month": 5,
+      "markets": {
+        "per_match": true,
+        "tournament_winner": true
+      },
+      "auto_advance": true,
+      "model": "football_knockout",
+      "notes": "UEFA Europa League."
+    },
+
+    {
+      "id": "fifa_world_cup",
+      "name": "FIFA World Cup",
+      "short_name": "World Cup",
+      "sport": "football",
+      "type": "bracket",
+      "country": "International",
+      "flag": "🌍",
+      "icon": "🏆",
+      "active": true,
+      "espn_sport": "soccer",
+      "espn_league": "fifa.world",
+      "thesportsdb_league_id": "4429",
+      "rounds": [
+        "Group Stage",
+        "Round of 16",
+        "Quarter Final",
+        "Semi Final",
+        "Third Place",
+        "Final"
+      ],
+      "next_edition": "2026",
+      "markets": {
+        "per_match": true,
+        "tournament_winner": true,
+        "reach_final": true,
+        "group_winner": true
+      },
+      "auto_advance": true,
+      "model": "football_knockout",
+      "notes": "FIFA World Cup. 2026 edition: USA/Canada/Mexico."
+    },
+
+    {
+      "id": "uefa_euros",
+      "name": "UEFA European Championship",
+      "short_name": "UEFA Euros",
+      "sport": "football",
+      "type": "bracket",
+      "country": "Europe",
+      "flag": "🇪🇺",
+      "icon": "🏆",
+      "active": false,
+      "espn_sport": "soccer",
+      "espn_league": "uefa.euro",
+      "thesportsdb_league_id": "4430",
+      "rounds": [
+        "Group Stage",
+        "Round of 16",
+        "Quarter Final",
+        "Semi Final",
+        "Final"
+      ],
+      "next_edition": "2028",
+      "markets": {
+        "per_match": true,
+        "tournament_winner": true
+      },
+      "auto_advance": true,
+      "model": "football_knockout",
+      "notes": "UEFA Euros. Set active to true when tournament is live."
+    },
+
+    {
+      "id": "tennis_australian_open",
+      "name": "Australian Open",
+      "short_name": "Australian Open",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "Australia",
+      "flag": "🇦🇺",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "thesportsdb_league_id": "4424",
+      "surface": "hard",
+      "surface_display": "Hard Court",
+      "month": 1,
+      "rounds": [
+        "Round of 128",
+        "Round of 64",
+        "Round of 32",
+        "Round of 16",
+        "Quarter Final",
+        "Semi Final",
+        "Final"
+      ],
+      "draws": ["mens_singles", "womens_singles"],
+      "markets": {
+        "per_match": true,
+        "tournament_winner": true,
+        "reach_final": true,
+        "reach_semis": true
+      },
+      "auto_advance": true,
+      "model": "tennis_grand_slam",
+      "notes": "Hard court Grand Slam. January. Melbourne."
+    },
+
+    {
+      "id": "tennis_french_open",
+      "name": "Roland Garros",
+      "short_name": "French Open",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "France",
+      "flag": "🇫🇷",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "thesportsdb_league_id": "4421",
+      "surface": "clay",
+      "surface_display": "Clay Court",
+      "month": 5,
+      "rounds": [
+        "Round of 128",
+        "Round of 64",
+        "Round of 32",
+        "Round of 16",
+        "Quarter Final",
+        "Semi Final",
+        "Final"
+      ],
+      "draws": ["mens_singles", "womens_singles"],
+      "markets": {
+        "per_match": true,
+        "tournament_winner": true,
+        "reach_final": true,
+        "reach_semis": true
+      },
+      "auto_advance": true,
+      "model": "tennis_grand_slam",
+      "notes": "Clay court Grand Slam. May-June. Paris. Surface win rate carries highest weight."
+    },
+
+    {
+      "id": "tennis_wimbledon",
+      "name": "Wimbledon",
+      "short_name": "Wimbledon",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "England",
+      "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "thesportsdb_league_id": "4422",
+      "surface": "grass",
+      "surface_display": "Grass Court",
+      "month": 7,
+      "rounds": [
+        "Round of 128",
+        "Round of 64",
+        "Round of 32",
+        "Round of 16",
+        "Quarter Final",
+        "Semi Final",
+        "Final"
+      ],
+      "draws": ["mens_singles", "womens_singles"],
+      "markets": {
+        "per_match": true,
+        "tournament_winner": true,
+        "reach_final": true,
+        "reach_semis": true
+      },
+      "auto_advance": true,
+      "model": "tennis_grand_slam",
+      "notes": "Grass court Grand Slam. July. London."
+    },
+
+    {
+      "id": "tennis_us_open",
+      "name": "US Open",
+      "short_name": "US Open",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "USA",
+      "flag": "🇺🇸",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "thesportsdb_league_id": "4423",
+      "surface": "hard",
+      "surface_display": "Hard Court",
+      "month": 8,
+      "rounds": [
+        "Round of 128",
+        "Round of 64",
+        "Round of 32",
+        "Round of 16",
+        "Quarter Final",
+        "Semi Final",
+        "Final"
+      ],
+      "draws": ["mens_singles", "womens_singles"],
+      "markets": {
+        "per_match": true,
+        "tournament_winner": true,
+        "reach_final": true,
+        "reach_semis": true
+      },
+      "auto_advance": true,
+      "model": "tennis_grand_slam",
+      "notes": "Hard court Grand Slam. August-September. New York."
+    },
+
+    {
+      "id": "tennis_monte_carlo",
+      "name": "Monte-Carlo Masters",
+      "short_name": "Monte Carlo",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "Monaco",
+      "flag": "🇲🇨",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "surface": "clay",
+      "surface_display": "Clay Court",
+      "month": 4,
+      "rounds": ["Round of 32", "Round of 16", "Quarter Final", "Semi Final", "Final"],
+      "draws": ["mens_singles"],
+      "markets": { "per_match": true, "tournament_winner": true },
+      "auto_advance": true,
+      "model": "tennis_masters",
+      "notes": "ATP Masters 1000. Clay. April."
+    },
+
+    {
+      "id": "tennis_madrid_open",
+      "name": "Madrid Open",
+      "short_name": "Madrid Open",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "Spain",
+      "flag": "🇪🇸",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "surface": "clay",
+      "surface_display": "Clay Court",
+      "month": 5,
+      "rounds": ["Round of 32", "Round of 16", "Quarter Final", "Semi Final", "Final"],
+      "draws": ["mens_singles", "womens_singles"],
+      "markets": { "per_match": true, "tournament_winner": true },
+      "auto_advance": true,
+      "model": "tennis_masters",
+      "notes": "ATP/WTA Masters. Clay. May."
+    },
+
+    {
+      "id": "tennis_canadian_open",
+      "name": "Canadian Open",
+      "short_name": "Canadian Open",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "Canada",
+      "flag": "🇨🇦",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "surface": "hard",
+      "surface_display": "Hard Court",
+      "month": 8,
+      "rounds": ["Round of 32", "Round of 16", "Quarter Final", "Semi Final", "Final"],
+      "draws": ["mens_singles", "womens_singles"],
+      "markets": { "per_match": true, "tournament_winner": true },
+      "auto_advance": true,
+      "model": "tennis_masters",
+      "notes": "ATP/WTA Masters 1000. Hard. August."
+    },
+
+    {
+      "id": "tennis_cincinnati_open",
+      "name": "Cincinnati Open",
+      "short_name": "Cincinnati",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "USA",
+      "flag": "🇺🇸",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "surface": "hard",
+      "surface_display": "Hard Court",
+      "month": 8,
+      "rounds": ["Round of 32", "Round of 16", "Quarter Final", "Semi Final", "Final"],
+      "draws": ["mens_singles", "womens_singles"],
+      "markets": { "per_match": true, "tournament_winner": true },
+      "auto_advance": true,
+      "model": "tennis_masters",
+      "notes": "ATP/WTA Masters 1000. Hard. August."
+    },
+
+    {
+      "id": "tennis_shanghai_masters",
+      "name": "Shanghai Masters",
+      "short_name": "Shanghai",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "China",
+      "flag": "🇨🇳",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "surface": "hard",
+      "surface_display": "Hard Court",
+      "month": 10,
+      "rounds": ["Round of 32", "Round of 16", "Quarter Final", "Semi Final", "Final"],
+      "draws": ["mens_singles"],
+      "markets": { "per_match": true, "tournament_winner": true },
+      "auto_advance": true,
+      "model": "tennis_masters",
+      "notes": "ATP Masters 1000. Hard. October."
+    },
+
+    {
+      "id": "tennis_paris_masters",
+      "name": "Paris Masters",
+      "short_name": "Paris Masters",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "France",
+      "flag": "🇫🇷",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "surface": "hard_indoor",
+      "surface_display": "Indoor Hard",
+      "month": 11,
+      "rounds": ["Round of 32", "Round of 16", "Quarter Final", "Semi Final", "Final"],
+      "draws": ["mens_singles"],
+      "markets": { "per_match": true, "tournament_winner": true },
+      "auto_advance": true,
+      "model": "tennis_masters",
+      "notes": "ATP Masters 1000. Indoor hard. November."
+    },
+
+    {
+      "id": "tennis_indian_wells",
+      "name": "Indian Wells Masters",
+      "short_name": "Indian Wells",
+      "sport": "tennis",
+      "type": "bracket",
+      "country": "USA",
+      "flag": "🇺🇸",
+      "icon": "🎾",
+      "active": true,
+      "espn_sport": "tennis",
+      "espn_league": "tennis",
+      "surface": "hard",
+      "surface_display": "Hard Court",
+      "month": 3,
+      "rounds": ["Round of 64", "Round of 32", "Round of 16", "Quarter Final", "Semi Final", "Final"],
+      "draws": ["mens_singles", "womens_singles"],
+      "markets": { "per_match": true, "tournament_winner": true },
+      "auto_advance": true,
+      "model": "tennis_masters",
+      "notes": "ATP/WTA Masters 1000. Hard. March."
+    },
+
+    {
+      "id": "golf_the_masters",
+      "name": "The Masters",
+      "short_name": "The Masters",
+      "sport": "golf",
+      "type": "leaderboard",
+      "country": "USA",
+      "flag": "🇺🇸",
+      "icon": "⛳",
+      "active": true,
+      "espn_sport": "golf",
+      "espn_league": "pga",
+      "thesportsdb_league_id": "4454",
+      "venue": "Augusta National",
+      "month": 4,
+      "rounds": ["Round 1", "Round 2", "Round 3", "Round 4"],
+      "cut_after_round": 2,
+      "markets": {
+        "tournament_winner": true,
+        "top_5_finish": true,
+        "make_cut": true,
+        "head_to_head": true
+      },
+      "auto_advance": true,
+      "model": "golf_major",
+      "notes": "First Major of the year. Augusta National. April."
+    },
+
+    {
+      "id": "golf_us_open",
+      "name": "US Open Golf",
+      "short_name": "US Open",
+      "sport": "golf",
+      "type": "leaderboard",
+      "country": "USA",
+      "flag": "🇺🇸",
+      "icon": "⛳",
+      "active": true,
+      "espn_sport": "golf",
+      "espn_league": "pga",
+      "thesportsdb_league_id": "4455",
+      "month": 6,
+      "rounds": ["Round 1", "Round 2", "Round 3", "Round 4"],
+      "cut_after_round": 2,
+      "markets": {
+        "tournament_winner": true,
+        "top_5_finish": true,
+        "make_cut": true,
+        "head_to_head": true
+      },
+      "auto_advance": true,
+      "model": "golf_major",
+      "notes": "Second Major. June."
+    },
+
+    {
+      "id": "golf_the_open",
+      "name": "The Open Championship",
+      "short_name": "The Open",
+      "sport": "golf",
+      "type": "leaderboard",
+      "country": "UK",
+      "flag": "🇬🇧",
+      "icon": "⛳",
+      "active": true,
+      "espn_sport": "golf",
+      "espn_league": "pga",
+      "thesportsdb_league_id": "4456",
+      "month": 7,
+      "rounds": ["Round 1", "Round 2", "Round 3", "Round 4"],
+      "cut_after_round": 2,
+      "markets": {
+        "tournament_winner": true,
+        "top_5_finish": true,
+        "make_cut": true,
+        "head_to_head": true
+      },
+      "auto_advance": true,
+      "model": "golf_major",
+      "notes": "Third Major. Links golf. July. UK."
+    },
+
+    {
+      "id": "golf_pga_championship",
+      "name": "PGA Championship",
+      "short_name": "PGA Championship",
+      "sport": "golf",
+      "type": "leaderboard",
+      "country": "USA",
+      "flag": "🇺🇸",
+      "icon": "⛳",
+      "active": true,
+      "espn_sport": "golf",
+      "espn_league": "pga",
+      "thesportsdb_league_id": "4457",
+      "month": 5,
+      "rounds": ["Round 1", "Round 2", "Round 3", "Round 4"],
+      "cut_after_round": 2,
+      "markets": {
+        "tournament_winner": true,
+        "top_5_finish": true,
+        "make_cut": true,
+        "head_to_head": true
+      },
+      "auto_advance": true,
+      "model": "golf_major",
+      "notes": "Fourth Major. May."
+    }
+
+  ],
+
+  "model_weights": {
+    "football_league": {
+      "elo_base": 0.35,
+      "head_to_head": 0.15,
+      "recent_form": 0.20,
+      "home_away": 0.10,
+      "goals_ratio": 0.10,
+      "competition_stage": 0.05,
+      "absence_flag": 0.05
+    },
+    "football_knockout": {
+      "elo_base": 0.35,
+      "head_to_head": 0.15,
+      "recent_form": 0.20,
+      "home_away": 0.10,
+      "goals_ratio": 0.10,
+      "competition_stage": 0.05,
+      "absence_flag": 0.05
+    },
+    "tennis_grand_slam": {
+      "ranking_elo": 0.25,
+      "surface_win_rate": 0.25,
+      "head_to_head": 0.20,
+      "recent_form": 0.15,
+      "seeding_path": 0.10,
+      "warmup_result": 0.05
+    },
+    "tennis_masters": {
+      "ranking_elo": 0.30,
+      "surface_win_rate": 0.20,
+      "head_to_head": 0.20,
+      "recent_form": 0.20,
+      "seeding_path": 0.10
+    },
+    "golf_major": {
+      "owgr_points": 0.30,
+      "course_history": 0.25,
+      "recent_cuts_made": 0.20,
+      "current_form": 0.15,
+      "strokes_gained": 0.10
+    }
+  },
+
+  "surface_win_rates": {
+    "_note": "Career surface win rates for top players. Hardcoded from public career statistics. Update manually when significant career changes occur.",
+    "clay": {
+      "Rafael Nadal": 0.919,
+      "Carlos Alcaraz": 0.821,
+      "Novak Djokovic": 0.862,
+      "Jannik Sinner": 0.798,
+      "Casper Ruud": 0.812,
+      "Stefanos Tsitsipas": 0.789,
+      "Iga Swiatek": 0.891,
+      "Aryna Sabalenka": 0.754,
+      "Coco Gauff": 0.743,
+      "Elena Rybakina": 0.712
+    },
+    "grass": {
+      "Novak Djokovic": 0.872,
+      "Carlos Alcaraz": 0.834,
+      "Jannik Sinner": 0.768,
+      "Roger Federer": 0.878,
+      "Iga Swiatek": 0.698,
+      "Aryna Sabalenka": 0.732,
+      "Elena Rybakina": 0.801,
+      "Coco Gauff": 0.721
+    },
+    "hard": {
+      "Novak Djokovic": 0.841,
+      "Jannik Sinner": 0.832,
+      "Carlos Alcaraz": 0.812,
+      "Daniil Medvedev": 0.798,
+      "Aryna Sabalenka": 0.821,
+      "Iga Swiatek": 0.834,
+      "Coco Gauff": 0.798,
+      "Elena Rybakina": 0.776
+    }
+  },
+
+  "stooq_ticker_map": {
+    "_note": "Maps Yahoo Finance tickers to Stooq format for fallback. Add new tickers here when adding financial markets.",
+    "AAPL": "aapl.us",
+    "MSFT": "msft.us",
+    "NVDA": "nvda.us",
+    "GOOGL": "googl.us",
+    "AMZN": "amzn.us",
+    "JPM": "jpm.us",
+    "GS": "gs.us",
+    "XOM": "xom.us",
+    "JNJ": "jnj.us",
+    "BRK-B": "brk-b.us",
+    "SPY": "spy.us",
+    "QQQ": "qqq.us",
+    "GLD": "gld.us",
+    "TLT": "tlt.us"
+  },
+
+  "admin_scanner_config": {
+    "poll_interval_minutes": 15,
+    "thesportsdb_fetch": "on_demand_only",
+    "espn_poll_source": true,
+    "flag_on_withdrawal": true,
+    "flag_on_postponement": true,
+    "flag_on_data_gap": true,
+    "auto_suspend_on_kickoff": true,
+    "auto_resolve_on_final": true,
+    "result_pending_check_minutes": 15
+  },
+
+  "financial_config": {
+    "primary_source": "yahoo_finance",
+    "yahoo_cors_param": "cors=true",
+    "fallback_source": "stooq",
+    "crypto_primary": "binance",
+    "crypto_fallback": "coingecko",
+    "history_days": 252,
+    "probability_ceiling": 0.70,
+    "price_update_time_et": "16:01",
+    "betting_suspend_hours_before_resolution": 24,
+    "trading_days_per_month": 21
+  }
+}
