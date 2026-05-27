@@ -20,7 +20,7 @@
   --r:8px;--r-lg:14px;--r-xl:20px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100vh;}
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 button,input,select{font-family:var(--fb);cursor:pointer;}
@@ -38,10 +38,10 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
   position:sticky;top:0;z-index:200;backdrop-filter:blur(8px);}
 
 /* ── LAYOUT ── */
-.app{display:flex;min-height:calc(100vh - 32px);}
+.app{display:flex;min-height:calc(100vh - 32px);overflow-x:hidden;}
 
 /* ── SIDEBAR ── */
-.sidebar{width:206px;min-width:206px;background:var(--bg2);border-right:1px solid var(--border);
+.sidebar{width:206px;background:var(--bg2);border-right:1px solid var(--border);
   display:flex;flex-direction:column;padding:16px 0;
   position:sticky;top:32px;height:calc(100vh - 32px);overflow-y:auto;z-index:100;}
 .logo{padding:0 14px 20px;font-family:var(--fd);font-weight:800;font-size:18px;
@@ -945,18 +945,18 @@ const MOCK_TOURNAMENTS = [
   {id:'fifa_world_cup',name:'FIFA World Cup 2026',short_name:'World Cup',flag:'🌍',icon:'🏆',sport:'football',type:'bracket',active:true,status:'Group Stage — starts Jun 11',activeMarkets:24,
    bracket:[{round:'Round of 32',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-06-28',status:'pending'}]}],
    groupFixtures:{
-     'A':[{homeTeam:'Mexico',awayTeam:'South Africa',yes:62,closes:'Jun 11',suspendReason:null,suspended:false,resolved:false,id:'wc_mex_rsa',group:'A'},{homeTeam:'South Korea',awayTeam:'Czechia',yes:55,closes:'Jun 11',suspended:false,resolved:false,id:'wc_kor_cze',group:'A'}],
-     'B':[{homeTeam:'Canada',awayTeam:'Bosnia',yes:54,closes:'Jun 12',suspended:false,resolved:false,id:'wc_can_bih',group:'B'},{homeTeam:'Qatar',awayTeam:'Switzerland',yes:34,closes:'Jun 13',suspended:false,resolved:false,id:'wc_qat_sui',group:'B'}],
-     'C':[{homeTeam:'Brazil',awayTeam:'Morocco',yes:61,closes:'Jun 13',suspended:false,resolved:false,id:'wc_bra_mar',group:'C'},{homeTeam:'Haiti',awayTeam:'Scotland',yes:38,closes:'Jun 13',suspended:false,resolved:false,id:'wc_hai_sco',group:'C'}],
-     'D':[{homeTeam:'USA',awayTeam:'Paraguay',yes:58,closes:'Jun 12',suspended:false,resolved:false,id:'wc_usa_par',group:'D'},{homeTeam:'Australia',awayTeam:'Turkiye',yes:48,closes:'Jun 13',suspended:false,resolved:false,id:'wc_aus_tur',group:'D'}],
-     'E':[{homeTeam:'Germany',awayTeam:'Curacao',yes:88,closes:'Jun 14',suspended:false,resolved:false,id:'wc_ger_cur',group:'E'},{homeTeam:'Ivory Coast',awayTeam:'Ecuador',yes:47,closes:'Jun 16',suspended:false,resolved:false,id:'wc_civ_ecu',group:'E'}],
-     'F':[{homeTeam:'Netherlands',awayTeam:'Japan',yes:58,closes:'Jun 14',suspended:false,resolved:false,id:'wc_ned_jpn',group:'F'},{homeTeam:'Sweden',awayTeam:'Tunisia',yes:61,closes:'Jun 16',suspended:false,resolved:false,id:'wc_swe_tun',group:'F'}],
-     'G':[{homeTeam:'Belgium',awayTeam:'Egypt',yes:62,closes:'Jun 15',suspended:false,resolved:false,id:'wc_bel_egy',group:'G'},{homeTeam:'New Zealand',awayTeam:'Iran',yes:44,closes:'Jun 16',suspended:false,resolved:false,id:'wc_nzl_irn',group:'G'}],
-     'H':[{homeTeam:'Spain',awayTeam:'Cape Verde',yes:84,closes:'Jun 15',suspended:false,resolved:false,id:'wc_esp_cpv',group:'H'},{homeTeam:'Uruguay',awayTeam:'Saudi Arabia',yes:64,closes:'Jun 17',suspended:false,resolved:false,id:'wc_uru_ksa',group:'H'}],
-     'I':[{homeTeam:'France',awayTeam:'Senegal',yes:63,closes:'Jun 15',suspended:false,resolved:false,id:'wc_fra_sen',group:'I'},{homeTeam:'Norway',awayTeam:'Iraq',yes:68,closes:'Jun 16',suspended:false,resolved:false,id:'wc_nor_irq',group:'I'}],
-     'J':[{homeTeam:'Argentina',awayTeam:'Algeria',yes:74,closes:'Jun 15',suspended:false,resolved:false,id:'wc_arg_alg',group:'J'},{homeTeam:'Austria',awayTeam:'Jordan',yes:62,closes:'Jun 17',suspended:false,resolved:false,id:'wc_aut_jor',group:'J'}],
-     'K':[{homeTeam:'Portugal',awayTeam:'DR Congo',yes:71,closes:'Jun 15',suspended:false,resolved:false,id:'wc_por_cod',group:'K'},{homeTeam:'Colombia',awayTeam:'Uzbekistan',yes:64,closes:'Jun 17',suspended:false,resolved:false,id:'wc_col_uzb',group:'K'}],
-     'L':[{homeTeam:'England',awayTeam:'Croatia',yes:64,closes:'Jun 14',suspended:false,resolved:false,id:'wc_eng_cro',group:'L'},{homeTeam:'Ghana',awayTeam:'Panama',yes:54,closes:'Jun 17',suspended:false,resolved:false,id:'wc_gha_pan',group:'L'}],
+     'A':[{homeTeam:'Mexico',awayTeam:'South Africa',yes:69,closes:'Jun 11',suspended:false,resolved:false,id:'wc_mex_sou_A',group:'A'},{homeTeam:'South Korea',awayTeam:'Czechia',yes:68,closes:'Jun 11',suspended:false,resolved:false,id:'wc_sou_cze_A',group:'A'},{homeTeam:'Mexico',awayTeam:'South Korea',yes:60,closes:'Jun 15',suspended:false,resolved:false,id:'wc_mex_sou_A',group:'A'},{homeTeam:'Czechia',awayTeam:'South Africa',yes:48,closes:'Jun 15',suspended:false,resolved:false,id:'wc_cze_sou_A',group:'A'},{homeTeam:'Mexico',awayTeam:'Czechia',yes:73,closes:'Jun 25',suspended:false,resolved:false,id:'wc_mex_cze_A',group:'A'},{homeTeam:'South Africa',awayTeam:'South Korea',yes:43,closes:'Jun 25',suspended:false,resolved:false,id:'wc_sou_sou_A',group:'A'}],
+     'B':[{homeTeam:'Canada',awayTeam:'Bosnia and Herzegovina',yes:62,closes:'Jun 12',suspended:false,resolved:false,id:'wc_can_bos_B',group:'B'},{homeTeam:'Qatar',awayTeam:'Switzerland',yes:38,closes:'Jun 13',suspended:false,resolved:false,id:'wc_qat_swi_B',group:'B'},{homeTeam:'Canada',awayTeam:'Qatar',yes:57,closes:'Jun 16',suspended:false,resolved:false,id:'wc_can_qat_B',group:'B'},{homeTeam:'Bosnia and Herzegovina',awayTeam:'Switzerland',yes:33,closes:'Jun 16',suspended:false,resolved:false,id:'wc_bos_swi_B',group:'B'},{homeTeam:'Canada',awayTeam:'Switzerland',yes:42,closes:'Jun 26',suspended:false,resolved:false,id:'wc_can_swi_B',group:'B'},{homeTeam:'Bosnia and Herzegovina',awayTeam:'Qatar',yes:48,closes:'Jun 26',suspended:false,resolved:false,id:'wc_bos_qat_B',group:'B'}],
+     'C':[{homeTeam:'Brazil',awayTeam:'Morocco',yes:65,closes:'Jun 13',suspended:false,resolved:false,id:'wc_bra_mor_C',group:'C'},{homeTeam:'Haiti',awayTeam:'Scotland',yes:39,closes:'Jun 13',suspended:false,resolved:false,id:'wc_hai_sco_C',group:'C'},{homeTeam:'Brazil',awayTeam:'Haiti',yes:84,closes:'Jun 17',suspended:false,resolved:false,id:'wc_bra_hai_C',group:'C'},{homeTeam:'Morocco',awayTeam:'Scotland',yes:63,closes:'Jun 17',suspended:false,resolved:false,id:'wc_mor_sco_C',group:'C'},{homeTeam:'Brazil',awayTeam:'Scotland',yes:74,closes:'Jun 26',suspended:false,resolved:false,id:'wc_bra_sco_C',group:'C'},{homeTeam:'Morocco',awayTeam:'Haiti',yes:75,closes:'Jun 26',suspended:false,resolved:false,id:'wc_mor_hai_C',group:'C'}],
+     'D':[{homeTeam:'USA',awayTeam:'Paraguay',yes:69,closes:'Jun 12',suspended:false,resolved:false,id:'wc_usa_par_D',group:'D'},{homeTeam:'Australia',awayTeam:'Turkiye',yes:59,closes:'Jun 13',suspended:false,resolved:false,id:'wc_aus_tur_D',group:'D'},{homeTeam:'USA',awayTeam:'Australia',yes:62,closes:'Jun 16',suspended:false,resolved:false,id:'wc_usa_aus_D',group:'D'},{homeTeam:'Paraguay',awayTeam:'Turkiye',yes:52,closes:'Jun 16',suspended:false,resolved:false,id:'wc_par_tur_D',group:'D'},{homeTeam:'USA',awayTeam:'Turkiye',yes:68,closes:'Jun 27',suspended:false,resolved:false,id:'wc_usa_tur_D',group:'D'},{homeTeam:'Paraguay',awayTeam:'Australia',yes:46,closes:'Jun 27',suspended:false,resolved:false,id:'wc_par_aus_D',group:'D'}],
+     'E':[{homeTeam:'Germany',awayTeam:'Curacao',yes:84,closes:'Jun 14',suspended:false,resolved:false,id:'wc_ger_cur_E',group:'E'},{homeTeam:'Ivory Coast',awayTeam:'Ecuador',yes:47,closes:'Jun 16',suspended:false,resolved:false,id:'wc_ivo_ecu_E',group:'E'},{homeTeam:'Germany',awayTeam:'Ivory Coast',yes:72,closes:'Jun 19',suspended:false,resolved:false,id:'wc_ger_ivo_E',group:'E'},{homeTeam:'Curacao',awayTeam:'Ecuador',yes:31,closes:'Jun 19',suspended:false,resolved:false,id:'wc_cur_ecu_E',group:'E'},{homeTeam:'Germany',awayTeam:'Ecuador',yes:67,closes:'Jun 27',suspended:false,resolved:false,id:'wc_ger_ecu_E',group:'E'},{homeTeam:'Ivory Coast',awayTeam:'Curacao',yes:70,closes:'Jun 27',suspended:false,resolved:false,id:'wc_ivo_cur_E',group:'E'}],
+     'F':[{homeTeam:'Netherlands',awayTeam:'Japan',yes:62,closes:'Jun 14',suspended:false,resolved:false,id:'wc_net_jap_F',group:'F'},{homeTeam:'Sweden',awayTeam:'Tunisia',yes:54,closes:'Jun 16',suspended:false,resolved:false,id:'wc_swe_tun_F',group:'F'},{homeTeam:'Netherlands',awayTeam:'Sweden',yes:70,closes:'Jun 20',suspended:false,resolved:false,id:'wc_net_swe_F',group:'F'},{homeTeam:'Japan',awayTeam:'Tunisia',yes:62,closes:'Jun 20',suspended:false,resolved:false,id:'wc_jap_tun_F',group:'F'},{homeTeam:'Netherlands',awayTeam:'Tunisia',yes:71,closes:'Jun 27',suspended:false,resolved:false,id:'wc_net_tun_F',group:'F'},{homeTeam:'Japan',awayTeam:'Sweden',yes:61,closes:'Jun 27',suspended:false,resolved:false,id:'wc_jap_swe_F',group:'F'}],
+     'G':[{homeTeam:'Belgium',awayTeam:'Egypt',yes:76,closes:'Jun 15',suspended:false,resolved:false,id:'wc_bel_egy_G',group:'G'},{homeTeam:'New Zealand',awayTeam:'Iran',yes:50,closes:'Jun 16',suspended:false,resolved:false,id:'wc_new_ira_G',group:'G'},{homeTeam:'Belgium',awayTeam:'New Zealand',yes:78,closes:'Jun 19',suspended:false,resolved:false,id:'wc_bel_new_G',group:'G'},{homeTeam:'Egypt',awayTeam:'Iran',yes:52,closes:'Jun 19',suspended:false,resolved:false,id:'wc_egy_ira_G',group:'G'},{homeTeam:'Belgium',awayTeam:'Iran',yes:76,closes:'Jun 27',suspended:false,resolved:false,id:'wc_bel_ira_G',group:'G'},{homeTeam:'Egypt',awayTeam:'New Zealand',yes:55,closes:'Jun 27',suspended:false,resolved:false,id:'wc_egy_new_G',group:'G'}],
+     'H':[{homeTeam:'Spain',awayTeam:'Cape Verde',yes:85,closes:'Jun 15',suspended:false,resolved:false,id:'wc_spa_cap_H',group:'H'},{homeTeam:'Uruguay',awayTeam:'Saudi Arabia',yes:75,closes:'Jun 17',suspended:false,resolved:false,id:'wc_uru_sau_H',group:'H'},{homeTeam:'Spain',awayTeam:'Uruguay',yes:66,closes:'Jun 20',suspended:false,resolved:false,id:'wc_spa_uru_H',group:'H'},{homeTeam:'Cape Verde',awayTeam:'Saudi Arabia',yes:52,closes:'Jun 20',suspended:false,resolved:false,id:'wc_cap_sau_H',group:'H'},{homeTeam:'Spain',awayTeam:'Saudi Arabia',yes:84,closes:'Jun 27',suspended:false,resolved:false,id:'wc_spa_sau_H',group:'H'},{homeTeam:'Uruguay',awayTeam:'Cape Verde',yes:75,closes:'Jun 27',suspended:false,resolved:false,id:'wc_uru_cap_H',group:'H'}],
+     'I':[{homeTeam:'France',awayTeam:'Senegal',yes:68,closes:'Jun 15',suspended:false,resolved:false,id:'wc_fra_sen_I',group:'I'},{homeTeam:'Norway',awayTeam:'Iraq',yes:62,closes:'Jun 16',suspended:false,resolved:false,id:'wc_nor_ira_I',group:'I'},{homeTeam:'France',awayTeam:'Norway',yes:73,closes:'Jun 21',suspended:false,resolved:false,id:'wc_fra_nor_I',group:'I'},{homeTeam:'Senegal',awayTeam:'Iraq',yes:67,closes:'Jun 21',suspended:false,resolved:false,id:'wc_sen_ira_I',group:'I'},{homeTeam:'France',awayTeam:'Iraq',yes:80,closes:'Jun 27',suspended:false,resolved:false,id:'wc_fra_ira_I',group:'I'},{homeTeam:'Senegal',awayTeam:'Norway',yes:59,closes:'Jun 27',suspended:false,resolved:false,id:'wc_sen_nor_I',group:'I'}],
+     'J':[{homeTeam:'Argentina',awayTeam:'Algeria',yes:73,closes:'Jun 15',suspended:false,resolved:false,id:'wc_arg_alg_J',group:'J'},{homeTeam:'Austria',awayTeam:'Jordan',yes:68,closes:'Jun 17',suspended:false,resolved:false,id:'wc_aus_jor_J',group:'J'},{homeTeam:'Argentina',awayTeam:'Austria',yes:68,closes:'Jun 21',suspended:false,resolved:false,id:'wc_arg_aus_J',group:'J'},{homeTeam:'Algeria',awayTeam:'Jordan',yes:62,closes:'Jun 21',suspended:false,resolved:false,id:'wc_alg_jor_J',group:'J'},{homeTeam:'Argentina',awayTeam:'Jordan',yes:80,closes:'Jun 27',suspended:false,resolved:false,id:'wc_arg_jor_J',group:'J'},{homeTeam:'Algeria',awayTeam:'Austria',yes:47,closes:'Jun 27',suspended:false,resolved:false,id:'wc_alg_aus_J',group:'J'}],
+     'K':[{homeTeam:'Portugal',awayTeam:'DR Congo',yes:84,closes:'Jun 15',suspended:false,resolved:false,id:'wc_por_dr _K',group:'K'},{homeTeam:'Colombia',awayTeam:'Uzbekistan',yes:73,closes:'Jun 17',suspended:false,resolved:false,id:'wc_col_uzb_K',group:'K'},{homeTeam:'Portugal',awayTeam:'Colombia',yes:67,closes:'Jun 22',suspended:false,resolved:false,id:'wc_por_col_K',group:'K'},{homeTeam:'DR Congo',awayTeam:'Uzbekistan',yes:52,closes:'Jun 22',suspended:false,resolved:false,id:'wc_dr _uzb_K',group:'K'},{homeTeam:'Portugal',awayTeam:'Uzbekistan',yes:84,closes:'Jun 27',suspended:false,resolved:false,id:'wc_por_uzb_K',group:'K'},{homeTeam:'DR Congo',awayTeam:'Colombia',yes:33,closes:'Jun 27',suspended:false,resolved:false,id:'wc_dr _col_K',group:'K'}],
+     'L':[{homeTeam:'England',awayTeam:'Croatia',yes:62,closes:'Jun 14',suspended:false,resolved:false,id:'wc_eng_cro_L',group:'L'},{homeTeam:'Ghana',awayTeam:'Panama',yes:54,closes:'Jun 17',suspended:false,resolved:false,id:'wc_gha_pan_L',group:'L'},{homeTeam:'England',awayTeam:'Ghana',yes:76,closes:'Jun 22',suspended:false,resolved:false,id:'wc_eng_gha_L',group:'L'},{homeTeam:'Croatia',awayTeam:'Panama',yes:69,closes:'Jun 22',suspended:false,resolved:false,id:'wc_cro_pan_L',group:'L'},{homeTeam:'England',awayTeam:'Panama',yes:77,closes:'Jun 27',suspended:false,resolved:false,id:'wc_eng_pan_L',group:'L'},{homeTeam:'Croatia',awayTeam:'Ghana',yes:68,closes:'Jun 27',suspended:false,resolved:false,id:'wc_cro_gha_L',group:'L'}],
    }},
   {id:'tennis_french_open',name:'Roland Garros',short_name:'French Open',flag:'🇫🇷',icon:'🎾',sport:'tennis',type:'bracket',active:true,surface:'Clay',status:'Semi Finals',activeMarkets:4,
    bracket:[{round:'Semi Finals',matches:[{home:'Alcaraz',away:'Djokovic',homeProb:54,date:'2026-06-06',status:'open'},{home:'Sinner',away:'Ruud',homeProb:63,date:'2026-06-06',status:'open'}]},{round:'Final',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-06-08',status:'pending'}]}]},
@@ -1308,11 +1308,14 @@ function mkTBody(t) {
       const groups = t.groupFixtures;
       const groupKeys = Object.keys(groups).sort();
       const groupsHTML = groupKeys.map(g => `
-        <div style="margin-bottom:14px;">
-          <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;padding:0 2px;">Group ${g}</div>
+        <div style="margin-bottom:16px;">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;padding:0 2px;display:flex;align-items:center;gap:8px;">
+            Group ${g}
+            <span style="font-weight:400;color:var(--text3);font-family:var(--fm);">${groups[g].length} matches</span>
+          </div>
           <div class="fl">
-            ${groups[g].slice(0,3).map(m=>`
-              <div class="fixr" style="${m.suspended?'opacity:0.8':''}">
+            ${groups[g].map((m,i) => `
+              <div class="fixr" style="${m.suspended?'opacity:0.8':''}${i>=2?'border-top:none;margin-top:-5px;':''}">
                 <div class="fixteams">
                   <span>${m.homeTeam}</span><span class="fixvs">vs</span><span>${m.awayTeam}</span>
                   ${m.suspended&&m.liveScore?`<span style="font-family:var(--fm);font-size:10px;color:var(--warn);margin-left:6px;background:var(--warn-dim);padding:1px 5px;border-radius:3px;">🔴 ${m.liveScore.homeScore}–${m.liveScore.awayScore}</span>`:''}
@@ -1388,7 +1391,22 @@ function mkBracketHTML(t) {
 
 function mkAllMarketsHTML(t) {
   const liveMkts = window.BidnessEngine.getSportsMarkets().filter(m=>m.tournamentId===t.id&&!m.resolved);
-  if (!liveMkts.length) return '<div style="padding:10px;font-size:11.5px;color:var(--text3);">No open markets</div>';
+  // R2: fall back to bracket/fixture data when engine markets not yet loaded
+  if (!liveMkts.length) {
+    const bracketMkts = (t.bracket||[]).flatMap(r=>r.matches)
+      .filter(m=>m.status==='open'&&m.home!=='TBD'&&m.away!=='TBD');
+    if (!bracketMkts.length) return '<div style="padding:10px;font-size:11.5px;color:var(--text3);">No open markets · Engine loading live data...</div>';
+    return `<div class="fl">${bracketMkts.map(m=>`
+      <div class="fixr">
+        <div class="fixteams"><span>${m.home}</span><span class="fixvs">vs</span><span>${m.away}</span>
+          ${m.venue?`<span style="font-size:9px;color:var(--text3);margin-left:6px;">📍 ${m.venue}</span>`:''}
+        </div>
+        <div class="fixp">${m.homeProb||50}%</div>
+        <div class="fixd">${fmtDate(m.date)}</div>
+        <button class="fy" onclick="openTrdSport('${t.id}-${m.home.replace(/ /g,'_')}','${m.home}','YES','${t.name}')">YES ${m.homeProb||50}%</button>
+        <button class="fn" onclick="openTrdSport('${t.id}-${m.away.replace(/ /g,'_')}','${m.away}','YES','${t.name}')">YES ${100-(m.homeProb||50)}%</button>
+      </div>`).join('')}</div>`;
+  }
   return `<div class="fl">${liveMkts.slice(0,12).map(m=>`
     <div class="fixr" style="${m.suspended?'opacity:0.8':''}">
       <div class="fixteams"><span>${m.homeTeam}</span><span class="fixvs">vs</span><span>${m.awayTeam}</span>${m.group?`<span style="font-size:9px;color:var(--text3);margin-left:5px;">Grp ${m.group}</span>`:''}</div>
