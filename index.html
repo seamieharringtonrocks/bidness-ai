@@ -500,16 +500,38 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
 .obdi{font-size:10.5px;color:var(--text3);margin-bottom:16px;}
 
 /* ── RESPONSIVE ── */
+@media(max-width:1200px){
+  .sidebar{width:178px;min-width:178px;}
+  .mg{grid-template-columns:repeat(auto-fill,minmax(255px,1fr));}
+  .al{grid-template-columns:1fr 240px;}
+}
+@media(max-width:1024px){
+  .sidebar{width:158px;min-width:158px;}
+  .ni{font-size:11.5px;padding:6px 8px;}
+  .logo{font-size:16px;}
+  .ss{grid-template-columns:repeat(2,1fr);}
+  .sumg{grid-template-columns:repeat(2,1fr);}
+  .al{grid-template-columns:1fr 210px;}
+  .mg{grid-template-columns:repeat(auto-fill,minmax(235px,1fr));}
+  .pg,.mh,.ss,.fr,.mg,.ts{padding-left:16px;padding-right:16px;}
+  .tb{padding:0 16px;}
+  .topbar{padding:7px 16px;}
+}
 @media(max-width:900px){
   .sidebar{display:none;}
   .ss,.sumg{grid-template-columns:repeat(2,1fr);}
   .al{grid-template-columns:1fr;}
+  .aside{display:none;}
 }
 @media(max-width:600px){
   .pg,.mh,.ss,.fr,.mg,.ts{padding-left:12px;padding-right:12px;}
   .hh{font-size:26px;}
   .mg{grid-template-columns:1fr;}
   .topbar{padding:6px 10px;}
+  .pod{flex-direction:column;align-items:center;}
+  .pc.p1,.pc.p2,.pc.p3{width:100%;max-width:320px;}
+  .modal{width:calc(100vw - 16px);}
+  .tb{padding:0 12px;}
 }
 </style>
 </head>
@@ -898,26 +920,28 @@ const MOCK_FLAGS = [
 ];
 
 const MOCK_TOURNAMENTS = [
-  {id:'eng_premier_league',name:'Premier League',short_name:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',icon:'⚽',sport:'football',type:'league',active:true,status:'Week 36 of 38',activeMarkets:10,
-   seasonWinner:[{team:'Arsenal',prob:48,color:'#EF0107'},{team:'Man City',prob:31,color:'#6CABDD'},{team:'Liverpool',prob:14,color:'#C8102E'},{team:'Chelsea',prob:7,color:'#034694'}],
-   fixtures:[{home:'Arsenal',away:'Everton',homeProb:78,date:'May 18',status:'open'},{home:'Liverpool',away:'Wolves',homeProb:72,date:'May 18',status:'open'},{home:'Man City',away:'West Ham',homeProb:81,date:'May 18',status:'open'}]},
-  {id:'sco_premiership',name:'Scottish Premiership',short_name:'Scottish Prem',flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',icon:'⚽',sport:'football',type:'league',active:true,status:'Week 35 of 38',activeMarkets:5,
-   seasonWinner:[{team:'Celtic',prob:68,color:'#16A734'},{team:'Rangers',prob:25,color:'#1B458F'},{team:'Hearts',prob:7,color:'#8B0000'}],
-   fixtures:[{home:'Celtic',away:'Rangers',homeProb:57,date:'May 25',status:'open'},{home:'Hearts',away:'Hibs',homeProb:51,date:'May 25',status:'open'}]},
-  {id:'fra_ligue1',name:'Ligue 1',short_name:'Ligue 1',flag:'🇫🇷',icon:'⚽',sport:'football',type:'league',active:true,status:'Week 34 of 34',activeMarkets:6,
-   seasonWinner:[{team:'PSG',prob:71,color:'#004170'},{team:'Marseille',prob:16,color:'#009FC9'},{team:'Monaco',prob:13,color:'#ED1C24'}],
-   fixtures:[{home:'PSG',away:'Lyon',homeProb:76,date:'May 18',status:'open'},{home:'Marseille',away:'Nice',homeProb:58,date:'May 18',status:'open'}]},
-  {id:'esp_laliga',name:'La Liga',short_name:'La Liga',flag:'🇪🇸',icon:'⚽',sport:'football',type:'league',active:true,status:'Week 36 of 38',activeMarkets:8,
-   seasonWinner:[{team:'Real Madrid',prob:54,color:'#FEBE10'},{team:'Barcelona',prob:32,color:'#A50044'},{team:'Atletico',prob:14,color:'#CB3524'}],
-   fixtures:[{home:'Real Madrid',away:'Sevilla',homeProb:81,date:'May 19',status:'open'},{home:'Barcelona',away:'Bilbao',homeProb:72,date:'May 19',status:'open'}]},
-  {id:'ita_seriea',name:'Serie A',short_name:'Serie A',flag:'🇮🇹',icon:'⚽',sport:'football',type:'league',active:true,status:'Week 37 of 38',activeMarkets:7,
-   seasonWinner:[{team:'Inter Milan',prob:56,color:'#0068A8'},{team:'AC Milan',prob:22,color:'#FB090B'},{team:'Juventus',prob:22,color:'#000000'}],
-   fixtures:[{home:'Inter Milan',away:'Lazio',homeProb:74,date:'May 19',status:'open'}]},
-  {id:'ger_bundesliga',name:'Bundesliga',short_name:'Bundesliga',flag:'🇩🇪',icon:'⚽',sport:'football',type:'league',active:true,status:'Week 33 of 34',activeMarkets:5,
-   seasonWinner:[{team:'Bayern Munich',prob:61,color:'#DC052D'},{team:'Leverkusen',prob:24,color:'#E32221'},{team:'Dortmund',prob:15,color:'#FDE100'}],
-   fixtures:[{home:'Bayern Munich',away:'Stuttgart',homeProb:79,date:'May 18',status:'open'}]},
-  {id:'uefa_champions_league',name:'Champions League',short_name:'UCL',flag:'🇪🇺',icon:'🏆',sport:'football',type:'bracket',active:true,status:'Semi Finals',activeMarkets:2,
-   bracket:[{round:'Semi Finals',matches:[{home:'Real Madrid',away:'Bayern Munich',homeProb:56,date:'2026-05-08',status:'open'},{home:'Arsenal',away:'PSG',homeProb:48,date:'2026-05-08',status:'open'}]},{round:'Final',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-06-01',status:'pending'}]}]},
+  {id:'eng_premier_league',name:'Premier League',short_name:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — Arsenal champions',activeMarkets:0,
+   seasonWinner:[{team:'Arsenal',prob:100,color:'#EF0107'},{team:'Man City',prob:0,color:'#6CABDD'},{team:'Liverpool',prob:0,color:'#C8102E'},{team:'Chelsea',prob:0,color:'#034694'}],
+   fixtures:[]},
+  {id:'sco_premiership',name:'Scottish Premiership',short_name:'Scottish Prem',flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — Celtic champions',activeMarkets:0,
+   seasonWinner:[{team:'Celtic',prob:100,color:'#16A734'},{team:'Rangers',prob:0,color:'#1B458F'},{team:'Hearts',prob:0,color:'#8B0000'}],
+   fixtures:[]},
+  {id:'fra_ligue1',name:'Ligue 1',short_name:'Ligue 1',flag:'🇫🇷',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — PSG champions',activeMarkets:0,
+   seasonWinner:[{team:'PSG',prob:100,color:'#004170'},{team:'Marseille',prob:0,color:'#009FC9'},{team:'Monaco',prob:0,color:'#ED1C24'}],
+   fixtures:[]},
+  {id:'esp_laliga',name:'La Liga',short_name:'La Liga',flag:'🇪🇸',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — Real Madrid champions',activeMarkets:0,
+   seasonWinner:[{team:'Real Madrid',prob:100,color:'#FEBE10'},{team:'Barcelona',prob:0,color:'#A50044'},{team:'Atletico',prob:0,color:'#CB3524'}],
+   fixtures:[]},
+  {id:'ita_seriea',name:'Serie A',short_name:'Serie A',flag:'🇮🇹',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — Inter Milan champions',activeMarkets:0,
+   seasonWinner:[{team:'Inter Milan',prob:100,color:'#0068A8'},{team:'AC Milan',prob:0,color:'#FB090B'},{team:'Juventus',prob:0,color:'#000000'}],
+   fixtures:[]},
+  {id:'ger_bundesliga',name:'Bundesliga',short_name:'Bundesliga',flag:'🇩🇪',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — Bayer Leverkusen champions',activeMarkets:0,
+   seasonWinner:[{team:'Bayer Leverkusen',prob:100,color:'#E32221'},{team:'Bayern Munich',prob:0,color:'#DC052D'},{team:'Dortmund',prob:0,color:'#FDE100'}],
+   fixtures:[]},
+  {id:'uefa_europa_league',name:'Europa League',short_name:'Europa League',flag:'🇪🇺',icon:'🏅',sport:'football',type:'bracket',active:true,status:'✅ Final resolved — Aston Villa won 3-0',activeMarkets:0,
+   bracket:[{round:'Final',matches:[{home:'Aston Villa',away:'Freiburg',homeProb:100,date:'2026-05-20',status:'resolved',winner:'Aston Villa',venue:'Beşiktaş Stadium, Istanbul'}]}]},
+  {id:'uefa_champions_league',name:'Champions League',short_name:'UCL',flag:'🇪🇺',icon:'🏆',sport:'football',type:'bracket',active:true,status:'⚽ Final — May 30, Puskás Aréna Budapest',activeMarkets:1,
+   bracket:[{round:'Final',matches:[{home:'PSG',away:'Arsenal',homeProb:52,date:'2026-05-30',status:'open',venue:'Puskás Aréna, Budapest'}]}]},
   {id:'fifa_world_cup',name:'FIFA World Cup 2026',short_name:'World Cup',flag:'🌍',icon:'🏆',sport:'football',type:'bracket',active:true,status:'Group Stage — starts Jun 11',activeMarkets:24,
    bracket:[{round:'Round of 32',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-06-28',status:'pending'}]}],
    groupFixtures:{
@@ -1155,11 +1179,17 @@ function togSG(hdr) {
 
 function mkTCard(t) {
   const statC=t.activeMarkets>0?'background:var(--yes-dim);color:var(--yes)':'background:var(--bg4);color:var(--text3)';
-  // R23: mock if engine not ready OR all markets for this tournament are config-sourced (not ESPN)
+  // R23: mock detection — only flag after 8s grace period (engine may still be loading)
+  // Don't flag resolved tournaments or golf coming soon
   const tMkts = window.BidnessEngine.getSportsMarkets().filter(m=>m.tournamentId===t.id);
-  const isMock = !window.BidnessEngine.ready ||
-    tMkts.length===0 ||
-    tMkts.every(m=>m.dataSource==='config'||m.dataSource==='loading'||!m.dataSource);
+  const engineAge = window._engineLoadTime ? (Date.now() - window._engineLoadTime) : 0;
+  const gracePeriodOver = engineAge > 8000;
+  const isResolved = t.status?.startsWith('✅');
+  const isMock = gracePeriodOver && !t.coming_soon && !isResolved && (
+    !window.BidnessEngine.ready ||
+    tMkts.length === 0 ||
+    tMkts.every(m => m.dataSource === 'config' || m.dataSource === 'loading' || !m.dataSource)
+  );
   const mockClass = isMock && !t.coming_soon ? ' mock-data' : '';
   const mockTag = isMock && !t.coming_soon
     ? `<span style="font-size:8.5px;font-family:var(--fm);font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#00e5ff;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.25);padding:1px 5px;border-radius:3px;margin-left:6px;">Mock</span>`
@@ -1193,6 +1223,22 @@ function mkTBody(t) {
       <div style="font-size:28px;margin-bottom:8px;">⛳</div>
       <div style="font-size:13px;font-weight:600;margin-bottom:5px;">Golf Markets — Coming Soon</div>
       <div style="font-size:11.5px;color:var(--text3);line-height:1.6;">OWGR probability model in development.<br>Course history, strokes gained, and cut-line markets will launch with the US Open.</div>
+    </div>`;
+  }
+
+  // ── Resolved / season complete ────────────────────
+  if (t.status?.startsWith('✅')) {
+    // Show final result prominently
+    const winner = t.seasonWinner?.[0];
+    const bracketFinal = t.bracket?.flatMap(r=>r.matches).find(m=>m.status==='resolved');
+    return `<div style="padding:16px;">
+      <div style="background:rgba(0,200,150,0.07);border:1px solid rgba(0,200,150,0.2);border-radius:8px;padding:14px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:6px;">🏆</div>
+        <div style="font-size:13px;font-weight:700;color:var(--yes);margin-bottom:3px;">${t.status.replace('✅ ','')}</div>
+        ${bracketFinal ? `<div style="font-size:11.5px;color:var(--text2);margin-top:4px;">${bracketFinal.home} ${bracketFinal.homeProb===100?'won':'vs'} ${bracketFinal.away}</div>` : ''}
+        ${winner && winner.prob===100 ? `<div style="font-size:11.5px;color:var(--text2);margin-top:4px;">Winners: <span style="color:var(--yes);font-weight:600;">${winner.team}</span></div>` : ''}
+        <div style="font-size:10.5px;color:var(--text3);margin-top:8px;">All markets resolved · Next season 2026–27</div>
+      </div>
     </div>`;
   }
 
@@ -1319,16 +1365,23 @@ function mkBracketHTML(t) {
     <div class="br">
       <div class="brt">${r.round}</div>
       ${r.matches.map(m=>`
-        <div class="bm">
-          <div class="bmt ${m.status==='resolved'&&m.winner===m.home?'win':m.home==='TBD'?'tbd':''}">${m.home} <span class="bmp">${m.homeProb||'—'}%</span></div>
+        <div class="bm" style="${m.status==='resolved'?'border-color:rgba(0,200,150,0.25);':''}">
+          <div class="bmt ${m.status==='resolved'&&m.winner===m.home?'win':m.home==='TBD'?'tbd':''}"
+               style="${m.status==='resolved'&&m.winner===m.home?'color:var(--yes);':''}"
+          >${m.home} ${m.status==='resolved'&&m.winner===m.home?'🏆':''} <span class="bmp">${m.homeProb||'—'}%</span></div>
           <div class="bsep"></div>
-          <div class="bmt ${m.status==='resolved'&&m.winner===m.away?'win':m.away==='TBD'?'tbd':''}">${m.away} <span class="bmp">${m.homeProb?100-m.homeProb:'—'}%</span></div>
+          <div class="bmt ${m.status==='resolved'&&m.winner===m.away?'win':m.away==='TBD'?'tbd':''}"
+               style="${m.status==='resolved'&&m.winner===m.away?'color:var(--yes);':''}"
+          >${m.away} ${m.status==='resolved'&&m.winner===m.away?'🏆':''} <span class="bmp">${m.homeProb?100-m.homeProb:'—'}%</span></div>
+          ${m.venue?`<div style="font-size:9px;color:var(--text3);margin-top:4px;text-align:center;">📍 ${m.venue}</div>`:''}
           ${m.status==='open'&&m.home!=='TBD'?`<div class="bmb">
-            <button class="bby" onclick="openTrdSport('${t.id}-${m.home.replace(/ /g,'_')}','${m.home}','YES','${t.name}')">YES</button>
-            <button class="bbn" onclick="openTrdSport('${t.id}-${m.home.replace(/ /g,'_')}','${m.home}','NO','${t.name}')">NO</button>
+            <button class="bby" onclick="openTrdSport('${t.id}-${m.home.replace(/ /g,'_')}','${m.home}','YES','${t.name}')">YES ${m.homeProb}%</button>
+            <button class="bbn" onclick="openTrdSport('${t.id}-${m.away.replace(/ /g,'_')}','${m.away}','NO','${t.name}')">YES ${100-m.homeProb}%</button>
           </div>`:''}
           ${m.status==='in_progress'?`<div style="margin-top:4px;font-size:9.5px;color:var(--warn);text-align:center;">🔴 LIVE</div>`:''}
           ${m.status==='result_pending'?`<div style="margin-top:4px;font-size:9.5px;color:var(--gold);text-align:center;">⏳ Result pending</div>`:''}
+          ${m.status==='resolved'?`<div style="margin-top:4px;font-size:9.5px;color:var(--yes);text-align:center;">✅ Resolved</div>`:''}
+          ${m.status==='pending'?`<div style="margin-top:4px;font-size:9.5px;color:var(--text3);text-align:center;">Awaiting result</div>`:''}
         </div>`).join('')}
     </div>`).join('')}</div></div>`;
 }
@@ -1756,6 +1809,7 @@ function closeOB(){
 // ENGINE EVENTS — wired to engine.js outputs
 // ═══════════════════════════════════════════
 window.addEventListener('bidness:ready', e => {
+  window._engineLoadTime = Date.now();
   console.log('[UI] Engine ready:', e.detail);
   rendMkts(getFilt());
   rendTournaments();
