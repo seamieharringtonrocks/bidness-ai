@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bidness.ai — Equity Race Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Cabinet+Grotesk:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080b0f;--bg2:#0d1117;--bg3:#121820;--bg4:#1a2332;--bg5:#202d3d;
+  --teal:#00e8c8;--teal2:#00b89e;--teal-dim:rgba(0,232,200,0.08);--teal-mid:rgba(0,232,200,0.18);
+  --purple:#a855f7;--purple2:#7c3aed;--purple-dim:rgba(168,85,247,0.10);
+  --gold:#f59e0b;--gold-dim:rgba(245,158,11,0.12);
+  --red:#ef4444;--green:#22c55e;
+  --text:#e2e8f0;--text2:#64748b;--text3:#334155;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --fd:'Bebas Neue',sans-serif;--fm:'DM Mono',monospace;--fb:'Cabinet Grotesk',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100vh;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+button{cursor:pointer;font-family:var(--fb);}
+input{font-family:var(--fb);}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.7)}}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes toastIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(14px)}}
+@keyframes chipPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.35)}50%{box-shadow:0 0 0 10px rgba(245,158,11,0)}}
+
+/* ── NAVBAR ── */
+.navbar{background:rgba(8,11,15,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+  padding:0 28px;display:flex;align-items:center;height:56px;position:sticky;top:0;z-index:300;}
+.nav-logo{font-family:var(--fd);font-size:22px;letter-spacing:3px;color:var(--teal);margin-right:32px;
+  text-shadow:0 0 24px rgba(0,232,200,0.4);cursor:pointer;}
+.nav-items{display:flex;gap:0;flex:1;overflow-x:auto;}
+.nav-item{padding:0 15px;height:56px;display:flex;align-items:center;font-size:11px;font-weight:700;
+  color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;
+  white-space:nowrap;letter-spacing:0.05em;text-transform:uppercase;border:none;background:none;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--teal);border-bottom:2px solid var(--teal);}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;}
+.nav-bal{font-family:var(--fm);font-size:12.5px;color:var(--teal);background:var(--teal-dim);
+  border:1px solid rgba(0,232,200,0.2);padding:5px 11px;border-radius:6px;}
+.nbtn{padding:6px 13px;border-radius:6px;font-size:11.5px;font-weight:700;border:none;
+  letter-spacing:0.04em;text-transform:uppercase;transition:all 0.15s;cursor:pointer;}
+.nbtn.p{background:var(--teal);color:#000;}
+.nbtn.p:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.nbtn.g{background:var(--bg4);color:var(--text2);border:1px solid var(--border2);}
+.nbtn.g:hover{color:var(--text);}
+
+/* ── PAGES ── */
+.page{display:none;}.page.active{display:block;}
+
+/* ══ HERO ══ */
+.hero{position:relative;overflow:hidden;padding:72px 36px 60px;text-align:center;
+  background:radial-gradient(ellipse 80% 400px at 50% -80px,rgba(0,232,200,0.07) 0%,transparent 70%),
+             radial-gradient(ellipse 50% 300px at 85% 60%,rgba(168,85,247,0.05) 0%,transparent 70%);}
+.hero-canvas{position:absolute;inset:0;opacity:0.07;pointer-events:none;}
+.hero-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,0.1);
+  border:1px solid rgba(245,158,11,0.3);border-radius:20px;padding:5px 14px;
+  font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;
+  margin-bottom:18px;animation:chipPulse 3s infinite;}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite;}
+.hero-h{font-family:var(--fd);font-size:clamp(52px,8vw,92px);letter-spacing:4px;line-height:0.92;
+  margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,var(--teal) 50%,var(--purple) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:clamp(13px,2vw,16px);color:var(--text2);max-width:500px;margin:0 auto 26px;
+  line-height:1.75;font-weight:500;}
+.hero-sub strong{color:var(--teal);font-weight:700;}
+.hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:44px;}
+.hbtn{padding:11px 26px;border-radius:8px;font-size:12.5px;font-weight:700;
+  letter-spacing:0.05em;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.18s;}
+.hbtn.m{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#000;
+  box-shadow:0 0 24px rgba(0,232,200,0.3);}
+.hbtn.m:hover{transform:translateY(-2px);box-shadow:0 6px 32px rgba(0,232,200,0.45);}
+.hbtn.o{background:transparent;color:var(--teal);border:1px solid rgba(0,232,200,0.4);}
+.hbtn.o:hover{background:var(--teal-dim);transform:translateY(-1px);}
+.countdown{display:flex;gap:14px;justify-content:center;align-items:flex-start;margin-bottom:44px;}
+.cd-block{text-align:center;}
+.cd-num{font-family:var(--fd);font-size:clamp(34px,5vw,52px);letter-spacing:3px;line-height:1;
+  background:linear-gradient(180deg,#fff,var(--text2));-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;}
+.cd-lbl{font-size:9.5px;font-weight:700;letter-spacing:0.12em;color:var(--text3);
+  text-transform:uppercase;margin-top:3px;}
+.cd-sep{font-family:var(--fd);font-size:40px;color:var(--text3);line-height:1.1;}
+.hero-stats{display:flex;gap:1px;background:var(--border);border-radius:12px;overflow:hidden;
+  max-width:600px;margin:0 auto;border:1px solid var(--border);}
+.hs-i{flex:1;background:var(--bg2);padding:14px 18px;text-align:center;}
+.hs-v{font-family:var(--fm);font-size:19px;font-weight:500;color:var(--teal);margin-bottom:3px;}
+.hs-l{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;}
+
+/* ══ LEGENDS BOARD ══ */
+.lb-wrap{display:grid;grid-template-columns:1fr 272px;gap:18px;padding:24px 28px;}
+@media(max-width:1000px){.lb-wrap{grid-template-columns:1fr;}}
+.lb-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+.lb-title{font-family:var(--fd);font-size:26px;letter-spacing:2px;}
+.lb-srch{background:var(--bg3);border:1px solid var(--border);border-radius:7px;
+  padding:7px 13px;color:var(--text);font-size:12px;outline:none;width:190px;}
+.lb-srch::placeholder{color:var(--text3);}
+.lb-srch:focus{border-color:var(--border2);}
+.lb-tabs{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;width:fit-content;margin-bottom:16px;}
+.lb-tab{padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:0.05em;
+  text-transform:uppercase;color:var(--text3);cursor:pointer;border:none;background:none;transition:all 0.12s;}
+.lb-tab:hover{color:var(--text2);}
+.lb-tab.active{background:var(--bg5);color:var(--teal);}
+.lb-tbl{width:100%;border-collapse:collapse;background:var(--bg2);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.lb-tbl th{text-align:left;font-size:9.5px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--text3);padding:11px 13px;
+  border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
+.lb-tbl th:hover{color:var(--text2);}
+.lb-tbl td{padding:10px 13px;border-bottom:1px solid var(--border);font-size:12.5px;}
+.lb-tbl tr:last-child td{border-bottom:none;}
+.lb-tbl tr:hover td{background:var(--bg3);}
+.lb-tbl tr.gold td{background:rgba(245,158,11,0.05);}
+.lb-tbl tr.gold:hover td{background:rgba(245,158,11,0.09);}
+.rank-b{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;font-family:var(--fd);font-size:12px;}
+.rank-b.r1{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;}
+.rank-b.r2{background:linear-gradient(135deg,#94a3b8,#64748b);color:#000;}
+.rank-b.r3{background:linear-gradient(135deg,#cd7c3a,#92400e);color:#fff;}
+.rank-b.rx{background:var(--bg4);color:var(--text2);font-size:11px;}
+.ucell{display:flex;align-items:center;gap:9px;}
+.uav{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-family:var(--fd);font-size:13px;flex-shrink:0;}
+.uname{font-size:12.5px;font-weight:700;}
+.uhdl{font-size:10px;color:var(--text3);margin-top:1px;}
+.sbar-wrap{display:flex;align-items:center;gap:7px;}
+.sbar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;flex:1;min-width:55px;}
+.sbar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--teal),var(--purple));}
+.snum{font-family:var(--fm);font-size:11.5px;color:var(--text);white-space:nowrap;}
+.eq-badge{font-family:var(--fm);font-size:11px;color:var(--gold);background:var(--gold-dim);
+  border:1px solid rgba(245,158,11,0.2);padding:2px 7px;border-radius:4px;}
+.profit-p{color:var(--green);font-family:var(--fm);font-size:12px;}
+.profit-n{color:var(--red);font-family:var(--fm);font-size:12px;}
+.acc-v{font-family:var(--fm);font-size:12px;color:var(--text2);}
+.lb-pag{display:flex;justify-content:center;gap:5px;margin-top:12px;}
+.pag-btn{width:26px;height:26px;border-radius:5px;background:var(--bg4);
+  color:var(--text3);border:1px solid var(--border);font-size:11px;cursor:pointer;transition:all 0.1s;}
+.pag-btn.active{background:var(--teal);color:#000;border-color:var(--teal);}
+
+/* EQUITY RACE SIDEBAR */
+.er-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.er-title{font-family:var(--fd);font-size:17px;letter-spacing:1.5px;margin-bottom:3px;}
+.er-sub{font-size:10.5px;color:var(--text3);margin-bottom:14px;}
+.er-pool{background:var(--gold-dim);border:1px solid rgba(245,158,11,0.2);border-radius:8px;
+  padding:11px;text-align:center;margin-bottom:14px;}
+.er-pool-v{font-family:var(--fd);font-size:26px;letter-spacing:2px;color:var(--gold);}
+.er-pool-l{font-size:9.5px;color:var(--gold);opacity:0.7;text-transform:uppercase;letter-spacing:0.08em;}
+.er-prog-wrap{height:7px;background:var(--bg4);border-radius:4px;overflow:hidden;margin-bottom:4px;}
+.er-prog{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--teal),var(--purple));}
+.er-prog-lbl{display:flex;justify-content:space-between;font-family:var(--fm);font-size:9.5px;color:var(--text3);margin-bottom:12px;}
+.er-note{background:rgba(0,232,200,0.05);border:1px solid rgba(0,232,200,0.14);border-radius:7px;
+  padding:9px;margin-bottom:12px;font-size:11px;color:var(--text2);line-height:1.65;}
+.er-note strong{color:var(--teal);}
+.er-mini-row{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);}
+.er-mini-row:last-child{border-bottom:none;}
+.er-mini-rank{font-family:var(--fm);font-size:9.5px;color:var(--text3);width:16px;}
+.er-mini-name{flex:1;font-size:11.5px;font-weight:600;}
+.er-mini-eq{font-family:var(--fm);font-size:11px;color:var(--gold);}
+.mini-av{display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);flex-shrink:0;border-radius:5px;}
+
+/* ══ REWARDS HUB ══ */
+.rh-wrap{padding:24px 28px;}
+.rh-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:4px;}
+.rh-title{font-family:var(--fd);font-size:26px;letter-spacing:2px;}
+.rh-sub{font-size:11.5px;color:var(--text3);margin-top:2px;}
+.pts-box{background:var(--teal-dim);border:1px solid rgba(0,232,200,0.2);border-radius:8px;padding:8px 16px;text-align:center;}
+.pts-v{font-family:var(--fm);font-size:17px;color:var(--teal);}
+.pts-l{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-top:1px;}
+.redeem-btn{margin-top:5px;padding:3px 10px;border-radius:4px;background:var(--teal);
+  color:#000;font-size:10px;font-weight:800;border:none;cursor:pointer;letter-spacing:0.05em;text-transform:uppercase;}
+.tier-card{background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(168,85,247,0.05));
+  border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:18px;margin-bottom:16px;}
+.tier-badge{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.tier-icon{font-size:30px;}
+.tier-name{font-family:var(--fd);font-size:22px;letter-spacing:2px;color:var(--gold);}
+.tier-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.xp-bar-wrap{height:9px;background:var(--bg4);border-radius:5px;overflow:hidden;margin-bottom:5px;}
+.xp-bar{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--gold),#fbbf24);}
+.xp-lbl{display:flex;justify-content:space-between;font-family:var(--fm);font-size:10.5px;color:var(--text3);}
+.perks{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px;}
+.perk{font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;
+  background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.18);}
+.rh-grid{display:grid;grid-template-columns:1fr 1fr 300px;gap:16px;}
+@media(max-width:1100px){.rh-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:700px){.rh-grid{grid-template-columns:1fr;}}
+.rh-sec{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.sec-title{font-family:var(--fd);font-size:17px;letter-spacing:1.5px;margin-bottom:12px;}
+.challenge{background:var(--bg3);border:1px solid var(--border);border-radius:9px;
+  padding:11px;cursor:pointer;transition:all 0.12s;margin-bottom:7px;}
+.challenge:last-child{margin-bottom:0;}
+.challenge:hover{border-color:var(--border2);background:var(--bg4);}
+.ch-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.ch-name{font-size:12.5px;font-weight:700;}
+.ch-rew{font-family:var(--fm);font-size:11px;color:var(--teal);background:var(--teal-dim);padding:2px 7px;border-radius:3px;}
+.ch-bar-wrap{height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-bottom:4px;}
+.ch-bar{height:100%;border-radius:2px;background:var(--teal);}
+.ch-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);}
+.t-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--border);
+  border-radius:11px;padding:13px;cursor:pointer;transition:all 0.15s;
+  position:relative;overflow:hidden;margin-bottom:8px;}
+.t-card:last-child{margin-bottom:0;}
+.t-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--teal),var(--purple));}
+.t-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.tc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.tc-title{font-size:13px;font-weight:700;}
+.tc-prize{font-family:var(--fm);font-size:12px;color:var(--gold);}
+.tc-meta{display:flex;gap:10px;font-size:10.5px;color:var(--text3);margin-bottom:7px;}
+.tc-cd{font-family:var(--fm);font-size:10.5px;color:var(--teal);margin-bottom:8px;}
+.tc-btn{width:100%;padding:7px;border-radius:5px;background:var(--teal-dim);
+  border:1px solid rgba(0,232,200,0.2);color:var(--teal);font-size:11.5px;
+  font-weight:700;letter-spacing:0.04em;text-transform:uppercase;transition:all 0.12s;}
+.tc-btn:hover{background:var(--teal-mid);}
+.tc-btn.joined{background:rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.2);color:var(--purple);}
+.badges-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.badge-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;
+  padding:11px;text-align:center;cursor:pointer;transition:all 0.15s;position:relative;}
+.badge-card:hover{border-color:var(--teal);transform:translateY(-2px);}
+.badge-card.earned{border-color:rgba(0,232,200,0.25);}
+.badge-card.locked{opacity:0.4;filter:grayscale(0.5);}
+.badge-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--teal);}
+.badge-em{font-size:22px;margin-bottom:5px;}
+.badge-nm{font-size:10px;font-weight:700;color:var(--text2);line-height:1.3;}
+
+/* ══ DASHBOARD ══ */
+.dash-layout{display:grid;grid-template-columns:232px 1fr 272px;min-height:calc(100vh - 56px);}
+@media(max-width:1100px){.dash-layout{grid-template-columns:1fr;}}
+.dash-left{background:var(--bg2);border-right:1px solid var(--border);padding:18px 14px;
+  position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
+.dash-center{padding:18px 22px;overflow-y:auto;}
+.dash-right{background:var(--bg2);border-left:1px solid var(--border);padding:14px;
+  position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
+@media(max-width:1100px){.dash-left,.dash-right{display:none;}}
+
+/* PROGRESS WIDGET */
+.pw-tier{background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(168,85,247,0.06));
+  border:1px solid rgba(245,158,11,0.2);border-radius:9px;padding:13px;margin-bottom:12px;}
+.pw-tier-top{display:flex;align-items:center;gap:7px;margin-bottom:9px;}
+.pw-tier-icon{font-size:20px;}
+.pw-tier-name{font-family:var(--fd);font-size:16px;letter-spacing:1.5px;color:var(--gold);}
+.pw-tier-rank{font-size:10.5px;color:var(--text3);margin-top:1px;}
+.pw-xp{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+.pw-xp-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),#fbbf24);}
+.pw-xp-lbl{display:flex;justify-content:space-between;font-family:var(--fm);font-size:9px;color:var(--text3);}
+.streak{background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(245,158,11,0.05));
+  border:1px solid rgba(239,68,68,0.18);border-radius:7px;padding:9px 11px;
+  display:flex;align-items:center;gap:9px;margin-bottom:11px;}
+.streak-num{font-family:var(--fd);font-size:26px;color:#ef4444;letter-spacing:1px;}
+.streak-lbl{font-size:11px;font-weight:700;color:var(--text2);}
+.streak-sub{font-size:9.5px;color:var(--text3);margin-top:1px;}
+.pw-stat{background:var(--bg3);border:1px solid var(--border);border-radius:7px;
+  padding:9px 11px;margin-bottom:7px;display:flex;align-items:center;gap:9px;}
+.pw-stat-ico{font-size:17px;flex-shrink:0;}
+.pw-stat-lbl{font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;}
+.pw-stat-val{font-family:var(--fm);font-size:13.5px;color:var(--text);}
+.pw-stat-sub{font-size:9.5px;color:var(--teal);margin-top:1px;}
+.pw-mini-title{font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;
+  letter-spacing:0.08em;margin:12px 0 7px;}
+.pw-mini-row{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);}
+.pw-mini-row:last-child{border-bottom:none;}
+.pw-mini-rank{font-family:var(--fm);font-size:9px;color:var(--text3);width:14px;}
+.pw-mini-name{flex:1;font-size:11px;font-weight:600;}
+.pw-mini-eq{font-family:var(--fm);font-size:10.5px;color:var(--gold);}
+
+/* MARKET CARDS */
+.mkt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:11px;margin-top:12px;}
+.mkt-card{background:var(--bg2);border:1px solid var(--border);border-radius:11px;
+  padding:13px;cursor:pointer;transition:all 0.14s;position:relative;}
+.mkt-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.mkt-cat-tag{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  padding:2px 7px;border-radius:3px;margin-bottom:8px;display:inline-block;}
+.mkt-q{font-size:12.5px;font-weight:600;line-height:1.4;margin-bottom:9px;}
+.mkt-probs{display:flex;justify-content:space-between;font-family:var(--fm);font-size:12.5px;margin-bottom:4px;}
+.mkt-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;
+  display:flex;margin-bottom:9px;}
+.mkt-yes{height:100%;background:var(--teal);border-radius:2px;}
+.mkt-btns{display:flex;gap:5px;}
+.mkt-y{flex:1;padding:5px;border-radius:5px;font-size:10.5px;font-weight:700;cursor:pointer;
+  background:rgba(0,232,200,0.09);border:1px solid rgba(0,232,200,0.18);color:var(--teal);transition:all 0.1s;}
+.mkt-y:hover{background:var(--teal-mid);}
+.mkt-n{flex:1;padding:5px;border-radius:5px;font-size:10.5px;font-weight:700;cursor:pointer;
+  background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.16);color:var(--red);transition:all 0.1s;}
+.mkt-n:hover{background:rgba(239,68,68,0.14);}
+
+/* ACTIVITY FEED */
+.af-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.af-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);}
+.af-live{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--teal);}
+.af-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:pulse 1.8s infinite;}
+.feed-list{display:flex;flex-direction:column;gap:5px;max-height:320px;overflow-y:auto;}
+.feed-item{background:var(--bg3);border:1px solid var(--border);border-radius:7px;
+  padding:8px 9px;animation:fadeSlide 0.28s ease;}
+.fi-text{font-size:11px;line-height:1.5;color:var(--text2);}
+.fi-text strong{color:var(--text);font-weight:700;}
+.fi-time{font-size:9.5px;color:var(--text3);margin-top:2px;font-family:var(--fm);}
+.fi-teal{color:var(--teal);}
+.fi-gold{color:var(--gold);}
+.fi-purple{color:var(--purple);}
+.fi-share{display:flex;gap:3px;margin-top:4px;}
+.fi-shr-btn{font-size:9px;padding:1px 5px;border-radius:2px;background:var(--bg4);
+  border:1px solid var(--border);color:var(--text3);cursor:pointer;transition:all 0.1s;}
+.fi-shr-btn:hover{color:var(--text);}
+.mini-lb-row{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--border);}
+.mini-lb-row:last-child{border-bottom:none;}
+.mini-lb-name{flex:1;font-size:11px;font-weight:600;}
+.mini-lb-score{font-family:var(--fm);font-size:11px;color:var(--teal);}
+
+/* ══ USER PROFILE ══ */
+.profile-wrap{padding:24px 28px;}
+.profile-hero{display:flex;align-items:flex-start;gap:18px;padding:20px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;
+  background:linear-gradient(135deg,rgba(0,232,200,0.03),rgba(168,85,247,0.02));}
+.prof-av-wrap{position:relative;flex-shrink:0;}
+.prof-av{width:76px;height:76px;border-radius:14px;display:flex;align-items:center;
+  justify-content:center;font-family:var(--fd);font-size:30px;
+  background:linear-gradient(135deg,rgba(0,232,200,0.15),rgba(168,85,247,0.15));
+  border:2px solid rgba(245,158,11,0.35);}
+.prof-rank-b{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
+  background:var(--gold);color:#000;font-family:var(--fd);font-size:10px;
+  padding:1px 8px;border-radius:4px;letter-spacing:1px;white-space:nowrap;}
+.prof-info{flex:1;}
+.prof-name{font-family:var(--fd);font-size:26px;letter-spacing:2px;margin-bottom:2px;}
+.prof-handle{font-size:12px;color:var(--text3);margin-bottom:9px;}
+.prof-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;}
+.prof-badge{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:3px;
+  background:var(--teal-dim);border:1px solid rgba(0,232,200,0.18);color:var(--teal);}
+.prof-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:18px;}
+@media(max-width:700px){.prof-stats-grid{grid-template-columns:repeat(2,1fr);}}
+.ps-card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:13px;text-align:center;}
+.ps-val{font-family:var(--fd);font-size:20px;letter-spacing:1px;margin-bottom:2px;}
+.ps-lbl{font-size:9.5px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;}
+.prof-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:14px;}
+.pt{padding:8px 16px;font-size:11.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
+  color:var(--text3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;
+  margin-bottom:-1px;transition:all 0.1s;}
+.pt:hover{color:var(--text2);}
+.pt.active{color:var(--teal);border-bottom-color:var(--teal);}
+.data-tbl{width:100%;border-collapse:collapse;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.data-tbl th{text-align:left;font-size:9.5px;color:var(--text3);text-transform:uppercase;
+  letter-spacing:0.07em;font-weight:700;padding:10px 13px;border-bottom:1px solid var(--border);}
+.data-tbl td{padding:10px 13px;border-bottom:1px solid var(--border);font-size:12px;}
+.data-tbl tr:last-child td{border-bottom:none;}
+.data-tbl tr:hover td{background:var(--bg3);}
+
+/* ══ MODALS ══ */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(7px);
+  z-index:1000;display:flex;align-items:center;justify-content:center;padding:18px;
+  opacity:0;pointer-events:none;transition:opacity 0.18s;}
+.modal-ov.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;
+  width:100%;max-width:540px;max-height:88vh;overflow-y:auto;
+  box-shadow:0 20px 80px rgba(0,0,0,0.7);
+  transform:scale(0.95) translateY(8px);transition:transform 0.18s;}
+.modal-ov.open .modal{transform:none;}
+.modal-hd{padding:18px 20px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;}
+.modal-title{font-family:var(--fd);font-size:20px;letter-spacing:2px;}
+.modal-cls{background:var(--bg4);border:1px solid var(--border);color:var(--text2);
+  width:26px;height:26px;border-radius:5px;cursor:pointer;font-size:15px;
+  display:flex;align-items:center;justify-content:center;transition:all 0.1s;}
+.modal-cls:hover{color:var(--text);}
+.modal-body{padding:20px;}
+.rule-sec{margin-bottom:18px;}
+.rule-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:var(--teal);margin-bottom:9px;}
+.rule-item{display:flex;gap:9px;margin-bottom:7px;font-size:12.5px;color:var(--text2);line-height:1.6;}
+.rule-bul{color:var(--teal);flex-shrink:0;font-weight:700;}
+.score-bk{display:flex;gap:7px;margin:10px 0;}
+.sb-i{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:11px;text-align:center;}
+.sb-pct{font-family:var(--fd);font-size:20px;letter-spacing:1px;margin-bottom:2px;}
+.sb-lbl{font-size:10px;color:var(--text3);font-weight:600;}
+.vest-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.vest-row:last-child{border-bottom:none;}
+.vest-k{color:var(--text2);}
+.vest-v{font-family:var(--fm);color:var(--teal);}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:18px;right:18px;z-index:2000;
+  display:flex;flex-direction:column;gap:5px;align-items:flex-end;}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;
+  padding:9px 13px;max-width:270px;box-shadow:0 8px 30px rgba(0,0,0,0.5);
+  display:flex;align-items:center;gap:7px;animation:toastIn 0.22s ease;}
+.toast.out{animation:toastOut 0.2s ease forwards;}
+.t-ico{font-size:15px;}
+.t-msg{font-size:12px;color:var(--text2);}
+.t-msg strong{color:var(--text);}
+
+/* UTIL */
+.section-hdr{font-family:var(--fd);font-size:20px;letter-spacing:2px;margin-bottom:4px;}
+.section-sub{font-size:11.5px;color:var(--text3);margin-bottom:16px;}
+
+@media(max-width:900px){
+  .navbar{padding:0 14px;}
+  .nav-items{gap:0;}
+  .nav-item{padding:0 10px;font-size:10px;}
+}
+@media(max-width:600px){
+  .hero-h{font-size:46px;}
+  .countdown{gap:8px;}
+  .hero{padding:48px 20px 44px;}
+  .lb-wrap,.rh-wrap,.profile-wrap{padding:16px;}
+  .dash-center{padding:14px 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ EQUITY RULES MODAL ══════════════════ -->
+<div class="modal-ov" id="equityModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title">EQUITY RULES</div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:2px;">How the 1.5% equity pool works</div>
+      </div>
+      <button class="modal-cls" onclick="closeModal('equityModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--gold-dim);border:1px solid rgba(245,158,11,0.25);border-radius:9px;padding:14px;text-align:center;margin-bottom:16px;">
+        <div style="font-family:var(--fd);font-size:34px;letter-spacing:3px;color:var(--gold);">1.5%</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">of Bidness.ai equity — shared between top 50 traders</div>
+        <div style="font-family:var(--fm);font-size:11px;color:var(--teal);margin-top:5px;">Cut-off: December 31, 2026 · 23:59 UTC</div>
+      </div>
+      <div class="rule-sec">
+        <div class="rule-title">The Pool</div>
+        <div class="rule-item"><span class="rule-bul">→</span><span>Top 50 users by total score on Dec 31, 2026 share 1.5% of Bidness.ai equity proportionally to their score.</span></div>
+        <div class="rule-item"><span class="rule-bul">→</span><span>Minimum activity: 30+ trades placed and 14+ active days in the qualifying period.</span></div>
+        <div class="rule-item"><span class="rule-bul">→</span><span>One account per person. KYC verification required before equity grant.</span></div>
+      </div>
+      <div class="rule-sec">
+        <div class="rule-title">Scoring Breakdown</div>
+        <div class="score-bk">
+          <div class="sb-i"><div class="sb-pct" style="color:var(--teal);">60%</div><div class="sb-lbl">Trading<br>Score</div></div>
+          <div class="sb-i"><div class="sb-pct" style="color:var(--purple);">30%</div><div class="sb-lbl">Engagement<br>Score</div></div>
+          <div class="sb-i"><div class="sb-pct" style="color:var(--gold);">10%</div><div class="sb-lbl">Contribution<br>Score</div></div>
+        </div>
+        <div class="rule-item"><span class="rule-bul">📈</span><span><strong style="color:var(--text);">Trading (60%)</strong> — Risk-adjusted profit, accuracy %, market diversity, total volume.</span></div>
+        <div class="rule-item"><span class="rule-bul">🔥</span><span><strong style="color:var(--text);">Engagement (30%)</strong> — Daily streaks, tournament entries, referrals, social sharing.</span></div>
+        <div class="rule-item"><span class="rule-bul">💡</span><span><strong style="color:var(--text);">Contribution (10%)</strong> — Markets created, liquidity provided, community feedback.</span></div>
+      </div>
+      <div class="rule-sec" style="margin-bottom:0;">
+        <div class="rule-title">Vesting Schedule</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:13px;">
+          <div class="vest-row"><span class="vest-k">Grant (Jan 1, 2027)</span><span class="vest-v">25% immediately</span></div>
+          <div class="vest-row"><span class="vest-k">Month 6 (Jul 1, 2027)</span><span class="vest-v">+25% → 50% total</span></div>
+          <div class="vest-row"><span class="vest-k">Month 12 (Jan 1, 2028)</span><span class="vest-v">+25% → 75% total</span></div>
+          <div class="vest-row"><span class="vest-k">Month 18 (Jul 1, 2028)</span><span class="vest-v">+25% → 100% total</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TOURNAMENT MODAL ══════════════════ -->
+<div class="modal-ov" id="tournModal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-hd">
+      <div><div class="modal-title" id="tm-title">TOURNAMENT</div><div style="font-size:11px;color:var(--text3);margin-top:2px;" id="tm-sub">—</div></div>
+      <button class="modal-cls" onclick="closeModal('tournModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="position:relative;overflow:hidden;background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--border2);border-radius:11px;padding:18px;">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--teal),var(--purple));"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px;">
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px;text-align:center;">
+            <div style="font-family:var(--fm);font-size:14px;color:var(--teal);" id="tm-prize">—</div>
+            <div style="font-size:9.5px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-top:2px;">Prize</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px;text-align:center;">
+            <div style="font-family:var(--fm);font-size:14px;color:var(--teal);" id="tm-players">—</div>
+            <div style="font-size:9.5px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-top:2px;">Players</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px;text-align:center;">
+            <div style="font-family:var(--fm);font-size:14px;color:var(--teal);" id="tm-time">—</div>
+            <div style="font-size:9.5px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-top:2px;">Time Left</div>
+          </div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Current Leaders</div>
+        <div id="tm-lb" style="margin-bottom:14px;"></div>
+        <button class="tc-btn" id="tm-join-btn" onclick="joinTournament()" style="font-size:12px;padding:10px;border-radius:7px;">Join Tournament</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ BADGE MODAL ══════════════════ -->
+<div class="modal-ov" id="badgeModal">
+  <div class="modal" style="max-width:340px;">
+    <div class="modal-hd">
+      <div style="font-size:34px;" id="bm-emoji">🏆</div>
+      <button class="modal-cls" onclick="closeModal('badgeModal')">×</button>
+    </div>
+    <div class="modal-body" style="padding-top:0;text-align:center;">
+      <div class="modal-title" id="bm-name" style="font-size:18px;margin-bottom:7px;"></div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.65;margin-bottom:12px;" id="bm-desc"></div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px;" id="bm-req"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ APP ══════════════════ -->
+<div>
+  <nav class="navbar">
+    <div class="nav-logo" onclick="window.location.href='index.html'">BIDNESS.AI</div>
+    <div class="nav-items">
+      <button class="nav-item" onclick="window.location.href='index.html'" style="color:var(--text3);gap:5px;">← Markets</button>
+      <button class="nav-item active" onclick="showPage('home',this)">Home</button>
+      <button class="nav-item" onclick="showPage('legends',this)">Legends Board</button>
+      <button class="nav-item" onclick="showPage('rewards',this)">Rewards Hub</button>
+      <button class="nav-item" onclick="showPage('dashboard',this)">Dashboard</button>
+      <button class="nav-item" onclick="showPage('profile',this)">My Profile</button>
+    </div>
+    <div class="nav-right">
+      <div class="nav-bal" id="eqBal">💰 $10,000.00</div>
+      <button class="nbtn g" onclick="openModal('equityModal')">Equity Rules 📋</button>
+      <button class="nbtn p" onclick="window.location.href='index.html'">Trade Now →</button>
+    </div>
+  </nav>
+
+  <!-- ════ HOME / HERO ════ -->
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <canvas class="hero-canvas" id="heroCanvas"></canvas>
+      <div class="hero-chip"><div class="chip-dot"></div>Equity Race — Active Now</div>
+      <div class="hero-h">Trade.<br>Compete.<br>Own.</div>
+      <div class="hero-sub">Top 50 traders and engagers by <strong>Dec 31, 2026</strong> will share <strong>1.5% of Bidness.ai equity</strong>. Every trade, streak, tournament, and badge counts toward your score.</div>
+      <div class="hero-btns">
+        <button class="hbtn m" onclick="showPage('dashboard',document.querySelectorAll('.nav-item')[3])">Start Trading →</button>
+        <button class="hbtn o" onclick="openModal('equityModal')">View Equity Rules</button>
+        <button class="hbtn o" onclick="showPage('legends',document.querySelectorAll('.nav-item')[1])">Legends Board</button>
+      </div>
+      <div class="countdown" id="countdown"></div>
+      <div class="hero-stats">
+        <div class="hs-i"><div class="hs-v">2,841</div><div class="hs-l">Active Traders</div></div>
+        <div class="hs-i"><div class="hs-v">1.5%</div><div class="hs-l">Equity Pool</div></div>
+        <div class="hs-i"><div class="hs-v">50</div><div class="hs-l">Spots Available</div></div>
+        <div class="hs-i"><div class="hs-v" id="heroDays">218</div><div class="hs-l">Days Remaining</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ LEGENDS BOARD ════ -->
+  <div class="page" id="page-legends">
+    <div class="lb-wrap">
+      <div>
+        <div class="lb-hdr">
+          <div>
+            <div class="lb-title">LEGENDS BOARD</div>
+            <div style="font-size:11.5px;color:var(--text3);margin-top:2px;">Top 50 earn 1.5% equity · Scoring engine live</div>
+          </div>
+          <input class="lb-srch" type="text" placeholder="Search trader..." oninput="filterLB(this.value)">
+        </div>
+        <div class="lb-tabs">
+          <button class="lb-tab active" onclick="setLBTab('totalScore',this)">Overall</button>
+          <button class="lb-tab" onclick="setLBTab('profit',this)">Profit</button>
+          <button class="lb-tab" onclick="setLBTab('accuracy',this)">Accuracy</button>
+          <button class="lb-tab" onclick="setLBTab('engScore',this)">Engagement</button>
+          <button class="lb-tab" onclick="setLBTab('liquidityProvided',this)">Liquidity</button>
+        </div>
+        <table class="lb-tbl">
+          <thead><tr>
+            <th onclick="sortLB('rank')">#</th>
+            <th onclick="sortLB('name')">Trader</th>
+            <th onclick="sortLB('totalScore')">Score ↕</th>
+            <th onclick="sortLB('projectedEquity')">Equity %</th>
+            <th onclick="sortLB('profit')">Profit</th>
+            <th onclick="sortLB('accuracy')">Accuracy</th>
+          </tr></thead>
+          <tbody id="lbBody"></tbody>
+        </table>
+        <div class="lb-pag" id="lbPag"></div>
+      </div>
+      <div>
+        <div class="er-box">
+          <div class="er-title">EQUITY RACE</div>
+          <div class="er-sub">Your position in the top 50</div>
+          <div class="er-pool"><div class="er-pool-v">1.5%</div><div class="er-pool-l">Total Equity Pool</div></div>
+          <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;font-weight:700;margin-bottom:5px;">Your progress to top 50</div>
+          <div class="er-prog-wrap"><div class="er-prog" style="width:62%"></div></div>
+          <div class="er-prog-lbl"><span>Your: 6,240 pts</span><span>Cut-off: ~7,800</span></div>
+          <div class="er-note">You are currently <strong>#47</strong>. You need <strong>1,560 more points</strong> to secure a top-50 position and earn equity.</div>
+          <div style="font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px;">Top 5 Leaders</div>
+          <div id="erMiniList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ REWARDS HUB ════ -->
+  <div class="page" id="page-rewards">
+    <div class="rh-wrap">
+      <div class="rh-top">
+        <div><div class="rh-title">REWARDS HUB</div><div class="rh-sub">Bidness Club · Challenges, badges, and tournaments</div></div>
+        <div class="pts-box">
+          <div class="pts-v">8,450 pts</div>
+          <div class="pts-l">Point Balance</div>
+          <button class="redeem-btn" onclick="toast('💎','Redeem store coming soon!')">Redeem</button>
+        </div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-badge"><div class="tier-icon">🥇</div>
+          <div><div class="tier-name">GOLD TIER</div><div class="tier-sub">Bidness Club · Top 15% of all traders</div></div>
+          <div style="margin-left:auto;text-align:right;"><div style="font-family:var(--fm);font-size:13px;color:var(--gold);">2,450 / 3,000 XP</div><div style="font-size:10px;color:var(--text3);">to Platinum</div></div>
+        </div>
+        <div class="xp-bar-wrap"><div class="xp-bar" style="width:81.7%"></div></div>
+        <div class="xp-lbl"><span>2,450 XP earned</span><span>81.7% to Platinum</span></div>
+        <div class="perks"><span class="perk">2× Points</span><span class="perk">Priority Support</span><span class="perk">Early Access</span><span class="perk">Lower Fees</span><span class="perk">Exclusive Markets</span></div>
+      </div>
+      <div class="rh-grid">
+        <div class="rh-sec"><div class="sec-title">ACTIVE CHALLENGES</div><div id="challengeList"></div></div>
+        <div class="rh-sec"><div class="sec-title">WEEKLY TOURNAMENTS</div><div id="tournamentCards"></div></div>
+        <div class="rh-sec"><div class="sec-title">BADGES EARNED</div><div class="badges-grid" id="badgesGrid"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ MAIN DASHBOARD ════ -->
+  <div class="page" id="page-dashboard">
+    <div class="dash-layout">
+      <div class="dash-left" id="progressWidget"></div>
+      <div class="dash-center">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px;">
+          <div><div class="section-hdr">LIVE MARKETS</div><div class="section-sub">8 of 1,847 open markets</div></div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            <button class="nbtn p" style="font-size:10px;padding:4px 9px;">All</button>
+            <button class="nbtn g" style="font-size:10px;padding:4px 9px;">Finance</button>
+            <button class="nbtn g" style="font-size:10px;padding:4px 9px;">Sports</button>
+            <button class="nbtn g" style="font-size:10px;padding:4px 9px;">Crypto</button>
+          </div>
+        </div>
+        <div class="mkt-grid" id="dashMarkets"></div>
+      </div>
+      <div class="dash-right">
+        <div class="af-hdr"><div class="af-title">Live Activity</div><div class="af-live"><div class="af-dot"></div>Live</div></div>
+        <div class="feed-list" id="dashFeed"></div>
+        <div style="font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin:14px 0 7px;">Top 5 Equity Race</div>
+        <div id="miniLB"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ USER PROFILE ════ -->
+  <div class="page" id="page-profile">
+    <div class="profile-wrap">
+      <div class="profile-hero">
+        <div class="prof-av-wrap">
+          <div class="prof-av">AR</div>
+          <div class="prof-rank-b">👑 #1</div>
+        </div>
+        <div class="prof-info">
+          <div class="prof-name">ALEXANDER ROWE</div>
+          <div class="prof-handle">@arow_capital · Joined Jan 2026</div>
+          <div class="prof-badges">
+            <span class="prof-badge">🔥 On Fire</span><span class="prof-badge">🎯 Oracle</span>
+            <span class="prof-badge">💎 Diamond</span><span class="prof-badge">⚡ Streak Master</span>
+          </div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;">
+            <button class="nbtn p" style="font-size:11px;" onclick="toast('👤','Followed @arow_capital!')">Follow</button>
+            <button class="nbtn g" style="font-size:11px;" onclick="toast('⚡','Challenge sent!')">Challenge</button>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-family:var(--fm);font-size:12px;color:var(--gold);">Projected Equity</div>
+          <div style="font-family:var(--fd);font-size:26px;letter-spacing:2px;color:var(--gold);">0.142%</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:1px;">of 1.5% pool · #1 position</div>
+        </div>
+      </div>
+      <div class="prof-stats-grid">
+        <div class="ps-card"><div class="ps-val" style="color:var(--teal);">+$2.4M</div><div class="ps-lbl">Total Profit</div></div>
+        <div class="ps-card"><div class="ps-val" style="color:var(--purple);">94.2%</div><div class="ps-lbl">Accuracy</div></div>
+        <div class="ps-card"><div class="ps-val" style="color:var(--gold);">18,470</div><div class="ps-lbl">Total Score</div></div>
+        <div class="ps-card"><div class="ps-val" style="color:var(--green);">1,847</div><div class="ps-lbl">Trades</div></div>
+      </div>
+      <div class="prof-tabs">
+        <button class="pt active" onclick="setProfTab('history',this)">Trading History</button>
+        <button class="pt" onclick="setProfTab('badges',this)">Badges Earned</button>
+        <button class="pt" onclick="setProfTab('markets',this)">Markets Created</button>
+      </div>
+      <div id="profTabContent"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+// ═══════════════════════════════════
+// SCORING ENGINE
+// ═══════════════════════════════════
+const SE = {
+  tradingScore(profit, accuracy, trades, volume) {
+    const ps = Math.min(5000, profit/1000*50);
+    const as = accuracy*30;
+    const ts = Math.min(1000, trades*0.5);
+    const vs = Math.min(500, volume/10000);
+    return Math.round((ps+as+ts+vs)*0.6);
+  },
+  engagementScore(streak, tournaments, referrals, shares) {
+    return Math.round((streak*20+tournaments*150+referrals*80+shares*10)*0.3);
+  },
+  contributionScore(marketsCreated, liquidityProvided) {
+    return Math.round((marketsCreated*200+liquidityProvided/100)*0.1);
+  },
+  totalScore(u) {
+    return SE.tradingScore(u.profit,u.accuracy,u.trades,u.volume)
+         + SE.engagementScore(u.streak,u.tournaments,u.referrals,u.shares)
+         + SE.contributionScore(u.marketsCreated,u.liquidityProvided);
+  },
+  projectedEquity(userScore, topSum) {
+    return topSum ? ((userScore/topSum)*1.5).toFixed(4) : '0.0000';
+  },
+  rankUsers(users) {
+    const scored = users.map(u=>({...u,totalScore:SE.totalScore(u),engScore:SE.engagementScore(u.streak,u.tournaments,u.referrals,u.shares)}));
+    scored.sort((a,b)=>b.totalScore-a.totalScore);
+    const topSum = scored.slice(0,50).reduce((s,u)=>s+u.totalScore,0);
+    return scored.map((u,i)=>({...u,rank:i+1,projectedEquity:i<50?SE.projectedEquity(u.totalScore,topSum):'0.0000'}));
+  }
+};
+
+// ═══════════════════════════════════
+// DATA
+// ═══════════════════════════════════
+const AVC=['linear-gradient(135deg,#00e8c8,#3d7fff)','linear-gradient(135deg,#a855f7,#ef4444)',
+  'linear-gradient(135deg,#f59e0b,#ef4444)','linear-gradient(135deg,#3d7fff,#a855f7)',
+  'linear-gradient(135deg,#ef4444,#f59e0b)','linear-gradient(135deg,#00e8c8,#a855f7)'];
+
+const RAW_USERS=[
+  {name:'Alexander Rowe',  handle:'@arow_capital',ini:'AR',av:0,profit:2400000,accuracy:94.2,trades:1847,volume:28400000,streak:62,tournaments:24,referrals:18,shares:142,marketsCreated:8, liquidityProvided:840000},
+  {name:'Elena Vasquez',   handle:'@elv_trades',  ini:'EV',av:1,profit:891000, accuracy:88.4,trades:923, volume:12100000,streak:28,tournaments:18,referrals:12,shares:88, marketsCreated:4, liquidityProvided:320000},
+  {name:'Marcus Kim',      handle:'@mk_forecast', ini:'MK',av:2,profit:654000, accuracy:91.7,trades:672, volume:9800000, streak:19,tournaments:14,referrals:7, shares:64, marketsCreated:3, liquidityProvided:240000},
+  {name:'Priya Sharma',    handle:'@ps_markets',  ini:'PS',av:3,profit:412000, accuracy:86.1,trades:548, volume:7200000, streak:15,tournaments:12,referrals:9, shares:54, marketsCreated:5, liquidityProvided:180000},
+  {name:"James O'Brien",   handle:'@job_predict', ini:'JO',av:4,profit:298000, accuracy:83.5,trades:441, volume:5900000, streak:12,tournaments:10,referrals:6, shares:41, marketsCreated:2, liquidityProvided:120000},
+  {name:'Yuki Tanaka',     handle:'@yt_analytics',ini:'YT',av:5,profit:187000, accuracy:89.3,trades:334, volume:4100000, streak:34,tournaments:8, referrals:4, shares:38, marketsCreated:3, liquidityProvided:90000},
+  {name:'Ravi Patel',      handle:'@ravi_calls',  ini:'RP',av:0,profit:142000, accuracy:81.2,trades:289, volume:3200000, streak:8, tournaments:7, referrals:3, shares:28, marketsCreated:1, liquidityProvided:60000},
+  {name:'Sofia Chen',      handle:'@sofia_bets',  ini:'SC',av:1,profit:98000,  accuracy:79.8,trades:201, volume:2400000, streak:5, tournaments:5, referrals:2, shares:22, marketsCreated:2, liquidityProvided:40000},
+  {name:'Diego Morales',   handle:'@dmorales_mkt',ini:'DM',av:2,profit:76000,  accuracy:78.4,trades:168, volume:1900000, streak:7, tournaments:4, referrals:1, shares:18, marketsCreated:1, liquidityProvided:30000},
+  {name:'Aisha Okonkwo',   handle:'@aisha_calls', ini:'AO',av:3,profit:64000,  accuracy:82.1,trades:144, volume:1600000, streak:22,tournaments:6, referrals:5, shares:32, marketsCreated:2, liquidityProvided:25000},
+  {name:'Lena Müller',     handle:'@lena_pred',   ini:'LM',av:4,profit:52000,  accuracy:76.9,trades:128, volume:1400000, streak:4, tournaments:3, referrals:1, shares:14, marketsCreated:0, liquidityProvided:20000},
+  {name:'Tomás García',    handle:'@tg_markets',  ini:'TG',av:5,profit:44000,  accuracy:75.3,trades:112, volume:1200000, streak:3, tournaments:3, referrals:0, shares:12, marketsCreated:1, liquidityProvided:15000},
+];
+const RANKED=SE.rankUsers(RAW_USERS);
+
+const CHALLENGES=[
+  {name:'7-Day Streak',       reward:'+350 XP', progress:71,goal:7,  done:5,  desc:'days active'},
+  {name:'Accuracy Elite',     reward:'+500 XP', progress:84,goal:50, done:42, desc:'trades ≥80% acc'},
+  {name:'Market Maker',       reward:'+200 XP', progress:60,goal:5,  done:3,  desc:'markets created'},
+  {name:'Liquidity Provider', reward:'+400 XP', progress:45,goal:10, done:4.5,desc:'liquidity rounds'},
+  {name:'Referral Champion',  reward:'+250 XP', progress:30,goal:10, done:3,  desc:'referrals'},
+];
+
+const TOURNAMENTS=[
+  {id:'t1',title:'Weekly Profit Sprint',  prize:'$500 USDC', entry:'Free',  countdown:'2d 14h',players:284,top5:['arow_capital','elv_trades','mk_forecast','ps_markets','job_predict']},
+  {id:'t2',title:'Accuracy Masters',      prize:'1,200 XP',  entry:'50 XP', countdown:'4d 08h',players:156,top5:['yt_analytics','aisha_calls','mk_forecast','arow_capital','elv_trades']},
+  {id:'t3',title:'Equity Race Qualifier', prize:'Equity Pts', entry:'Gold+', countdown:'6d 22h',players:89, top5:['arow_capital','ps_markets','elv_trades','ravi_calls','mk_forecast']},
+];
+
+const BADGES=[
+  {emoji:'🎯',name:'Oracle',        earned:true, desc:'Achieved 90%+ accuracy over 100+ trades.',req:'100 trades at 90%+ accuracy'},
+  {emoji:'🔥',name:'On Fire',       earned:true, desc:'Maintained a 30-day active streak.',      req:'30 consecutive active days'},
+  {emoji:'💎',name:'Diamond',       earned:true, desc:'Reached Diamond tier in Bidness Club.',   req:'Accumulate 5,000 XP total'},
+  {emoji:'⚡',name:'Streak Master', earned:true, desc:'Hit a legendary 50-day streak.',          req:'50 consecutive active days'},
+  {emoji:'🐋',name:'Whale',         earned:false,desc:'Place trades totalling over $1M volume.', req:'$1M+ total trading volume'},
+  {emoji:'🏆',name:'Champion',      earned:false,desc:'Win a Weekly Tournament outright.',       req:'Finish #1 in any tournament'},
+  {emoji:'💧',name:'Liq King',      earned:false,desc:'Provide $100K+ in liquidity.',            req:'$100K total liquidity provided'},
+  {emoji:'🌍',name:'Global',        earned:false,desc:'Trade across 20+ market categories.',     req:'20 distinct market categories'},
+  {emoji:'🧙',name:'Wizard',        earned:false,desc:'Create a market that hits $1M volume.',   req:'1 market with $1M+ volume'},
+];
+
+const MARKET_CARDS=[
+  {id:'m1',q:'Will PSG win the Champions League Final?',    cat:'Sports', cc:'#00e8c8',yes:52,icon:'⚽'},
+  {id:'m2',q:'Will Apple close above $200 by month end?',   cat:'Finance',cc:'#3d7fff',yes:63,icon:'🍎'},
+  {id:'m3',q:'Will Bitcoin close above $100K by month end?',cat:'Crypto', cc:'#f59e0b',yes:38,icon:'₿'},
+  {id:'m4',q:'Will France win Group I at the World Cup?',   cat:'Sports', cc:'#00e8c8',yes:78,icon:'🌍'},
+  {id:'m5',q:'Will NVIDIA close above $1,100 by month end?',cat:'Finance',cc:'#3d7fff',yes:56,icon:'🖥'},
+  {id:'m6',q:'Will ETH close above $4,000 by month end?',   cat:'Crypto', cc:'#f59e0b',yes:44,icon:'⟠'},
+  {id:'m7',q:'Will Argentina win Group J at World Cup?',    cat:'Sports', cc:'#00e8c8',yes:74,icon:'🌍'},
+  {id:'m8',q:'Will Fed cut rates before August 2026?',      cat:'Macro',  cc:'#a855f7',yes:67,icon:'🏛'},
+];
+
+const FEED_EVENTS=[
+  {text:'<strong>Alexander Rowe</strong> called Fed pause at <span class="fi-teal">19%</span> — <span class="fi-gold">+$340K profit</span> 🎯',time:'2 min ago',share:true},
+  {text:'<strong>Elena Vasquez</strong> hit a <span class="fi-teal">20-day streak</span> 🔥',time:'5 min ago',share:true},
+  {text:'<strong>Marcus Kim</strong> earned <span class="fi-gold">Oracle badge</span> 🎯',time:'8 min ago',share:false},
+  {text:'<strong>Priya Sharma</strong> placed <span class="fi-teal">$12,400</span> YES on PSG Final',time:'11 min ago',share:true},
+  {text:'Market resolved: <span class="fi-teal">Arsenal Premier League</span> → <strong>YES</strong> 💰 $284K settled',time:'18 min ago',share:false},
+  {text:'<strong>Yuki Tanaka</strong> joined <span class="fi-purple">Accuracy Masters</span> tournament',time:'22 min ago',share:false},
+  {text:'<strong>Ravi Patel</strong> referred 3 new traders — <span class="fi-gold">+240 XP</span>',time:'31 min ago',share:true},
+];
+
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+let lbTab='totalScore',lbPage=0,lbFilter='',lbSort='rank';
+let joinedT=new Set(),currentT=null,profTab='history';
+
+// ═══════════════════════════════════
+// UTILS
+// ═══════════════════════════════════
+const fmtP = n=>n>=1e6?'+$'+(n/1e6).toFixed(2)+'M':n>=1e3?'+$'+(n/1e3).toFixed(0)+'K':'+$'+n;
+const G = id=>document.getElementById(id);
+
+function toast(ico,msg){
+  const w=G('toasts');
+  const d=document.createElement('div');d.className='toast';
+  d.innerHTML=`<span class="t-ico">${ico}</span><span class="t-msg">${msg}</span>`;
+  w.appendChild(d);
+  setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),220);},3500);
+}
+
+// ═══════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  G('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+// ═══════════════════════════════════
+// MODALS
+// ═══════════════════════════════════
+function openModal(id){G(id).classList.add('open');}
+function closeModal(id){G(id).classList.remove('open');}
+document.addEventListener('click',e=>{if(e.target.classList.contains('modal-ov'))e.target.classList.remove('open');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-ov.open').forEach(m=>m.classList.remove('open'));});
+
+// ═══════════════════════════════════
+// COUNTDOWN
+// ═══════════════════════════════════
+function updateCD(){
+  const diff=new Date('2026-12-31T23:59:59Z')-new Date();
+  if(diff<=0)return;
+  const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000);
+  const m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+  const p=n=>String(n).padStart(2,'0');
+  G('countdown').innerHTML=`
+    <div class="cd-block"><div class="cd-num">${d}</div><div class="cd-lbl">Days</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-block"><div class="cd-num">${p(h)}</div><div class="cd-lbl">Hours</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-block"><div class="cd-num">${p(m)}</div><div class="cd-lbl">Mins</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-block"><div class="cd-num">${p(s)}</div><div class="cd-lbl">Secs</div></div>`;
+  if(G('heroDays'))G('heroDays').textContent=d;
+}
+
+// ═══════════════════════════════════
+// LEGENDS BOARD
+// ═══════════════════════════════════
+function setLBTab(tab,btn){lbTab=tab;lbPage=0;document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderLB();}
+function filterLB(v){lbFilter=v.toLowerCase();lbPage=0;renderLB();}
+function sortLB(col){lbSort=col;renderLB();}
+
+function renderLB(){
+  let users=[...RANKED];
+  if(lbFilter)users=users.filter(u=>u.name.toLowerCase().includes(lbFilter)||u.handle.toLowerCase().includes(lbFilter));
+  if(lbSort!=='rank'){
+    users.sort((a,b)=>{
+      const va=typeof a[lbSort]==='string'?parseFloat(a[lbSort]):a[lbSort];
+      const vb=typeof b[lbSort]==='string'?parseFloat(b[lbSort]):b[lbSort];
+      return vb-va;
+    });
+  }
+  const perPage=8,pages=Math.ceil(users.length/perPage);
+  const slice=users.slice(lbPage*perPage,(lbPage+1)*perPage);
+  const maxS=RANKED[0].totalScore;
+  G('lbBody').innerHTML=slice.map(u=>{
+    const av=AVC[u.av%AVC.length];
+    const rbC=u.rank<=3?`r${u.rank}`:'rx';
+    const ico=u.rank===1?'👑':u.rank===2?'🥈':u.rank===3?'🥉':u.rank;
+    const pct=(u.totalScore/maxS*100).toFixed(0);
+    return `<tr class="${u.rank===1?'gold':''}">
+      <td><div class="rank-b ${rbC}">${ico}</div></td>
+      <td><div class="ucell">
+        <div class="uav" style="background:${av};color:${u.av<=1?'#000':'#fff'}">${u.ini}</div>
+        <div><div class="uname">${u.name}</div><div class="uhdl">${u.handle}</div></div>
+      </div></td>
+      <td><div class="sbar-wrap"><div class="sbar"><div class="sbar-fill" style="width:${pct}%"></div></div><span class="snum">${u.totalScore.toLocaleString()}</span></div></td>
+      <td><span class="eq-badge">${u.projectedEquity}%</span></td>
+      <td><span class="profit-p">${fmtP(u.profit)}</span></td>
+      <td><span class="acc-v">${u.accuracy}%</span></td>
+    </tr>`;
+  }).join('');
+  G('lbPag').innerHTML=Array.from({length:pages},(_,i)=>`<button class="pag-btn${i===lbPage?' active':''}" onclick="lbPage=${i};renderLB()">${i+1}</button>`).join('');
+  const er=G('erMiniList');
+  if(er)er.innerHTML=RANKED.slice(0,5).map(u=>{
+    const av=AVC[u.av%AVC.length];
+    return `<div class="er-mini-row">
+      <span class="er-mini-rank">#${u.rank}</span>
+      <div class="mini-av" style="background:${av};color:${u.av<=1?'#000':'#fff'};width:20px;height:20px;font-size:9px;">${u.ini}</div>
+      <span class="er-mini-name">${u.name.split(' ')[0]}</span>
+      <span class="er-mini-eq">${u.projectedEquity}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════
+// REWARDS HUB
+// ═══════════════════════════════════
+function renderChallenges(){
+  G('challengeList').innerHTML=CHALLENGES.map(c=>`
+    <div class="challenge" onclick="toast('⚡','Challenge: ${c.name} — ${c.done}/${c.goal} ${c.desc}')">
+      <div class="ch-top"><div class="ch-name">${c.name}</div><div class="ch-rew">${c.reward}</div></div>
+      <div class="ch-bar-wrap"><div class="ch-bar" style="width:${c.progress}%"></div></div>
+      <div class="ch-meta"><span>${c.done} / ${c.goal} ${c.desc}</span><span>${c.progress}%</span></div>
+    </div>`).join('');
+}
+
+function renderTCards(){
+  G('tournamentCards').innerHTML=TOURNAMENTS.map(t=>`
+    <div class="t-card" onclick="openTournModal('${t.id}')">
+      <div class="tc-top"><div class="tc-title">${t.title}</div><div class="tc-prize">${t.prize}</div></div>
+      <div class="tc-meta"><span>👥 ${t.players}</span><span>🎫 ${t.entry}</span></div>
+      <div class="tc-cd">⏱ ${t.countdown} remaining</div>
+      <button class="tc-btn ${joinedT.has(t.id)?'joined':''}">${joinedT.has(t.id)?'✓ Joined':'Join Tournament'}</button>
+    </div>`).join('');
+}
+
+function openTournModal(id){
+  currentT=TOURNAMENTS.find(t=>t.id===id);if(!currentT)return;
+  G('tm-title').textContent=currentT.title.toUpperCase();
+  G('tm-sub').textContent=`${currentT.entry} entry · ${currentT.players} players`;
+  G('tm-prize').textContent=currentT.prize;
+  G('tm-players').textContent=currentT.players;
+  G('tm-time').textContent=currentT.countdown;
+  G('tm-lb').innerHTML=currentT.top5.map((n,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">
+      <span style="font-family:var(--fm);font-size:10px;color:${i===0?'var(--gold)':'var(--text3)'};width:16px;">${i+1}</span>
+      <span style="flex:1;font-size:12px;font-weight:600;">@${n}</span>
+      <span style="font-family:var(--fm);font-size:11px;color:var(--teal);">${(Math.random()*5000+1000).toFixed(0)} pts</span>
+    </div>`).join('');
+  const btn=G('tm-join-btn');
+  btn.textContent=joinedT.has(id)?'✓ Joined':'Join Tournament';
+  btn.className=joinedT.has(id)?'tc-btn joined':'tc-btn';
+  openModal('tournModal');
+}
+
+function joinTournament(){
+  if(!currentT)return;
+  joinedT.add(currentT.id);
+  G('tm-join-btn').textContent='✓ Joined';G('tm-join-btn').className='tc-btn joined';
+  renderTCards();toast('🏆',`Joined <strong>${currentT.title}</strong>!`);
+}
+
+function renderBadges(){
+  G('badgesGrid').innerHTML=BADGES.map(b=>{
+    const data=JSON.stringify(b).replace(/"/g,'&quot;');
+    return `<div class="badge-card ${b.earned?'earned':'locked'}" onclick='openBadgeModal(${data})'>
+      ${b.earned?'<div class="badge-dot"></div>':''}
+      <div class="badge-em">${b.emoji}</div>
+      <div class="badge-nm">${b.name}</div>
+    </div>`;
+  }).join('');
+}
+
+function openBadgeModal(b){
+  G('bm-emoji').textContent=b.emoji;
+  G('bm-name').textContent=b.name.toUpperCase();
+  G('bm-desc').textContent=b.desc;
+  G('bm-req').innerHTML=`<div style="font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Requirement</div>
+    <div style="font-size:12px;color:var(--text2);">${b.req}</div>
+    <div style="margin-top:7px;font-size:12px;color:${b.earned?'var(--teal)':'var(--text3)'};">${b.earned?'✅ Earned':'🔒 Not yet earned'}</div>`;
+  openModal('badgeModal');
+}
+
+// ═══════════════════════════════════
+// PROGRESS WIDGET
+// ═══════════════════════════════════
+function renderPW(){
+  // Use real data if available, otherwise defaults
+  const u = window._realUser || {};
+  const bal = u.balFmt || '$10,000.00';
+  const rank = u.rankNum || 47;
+  const projEq = u.projEq || '0.042';
+  const streak = u.streak || 12;
+  const acc = u.realAccuracy ? u.realAccuracy.toFixed(1) : '78.4';
+  const trades = u.tradeCount || 0;
+
+  G('progressWidget').innerHTML=`
+    <div style="font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:11px;">Your Progress</div>
+    <div class="pw-tier">
+      <div class="pw-tier-top"><div class="pw-tier-icon">🥇</div><div><div class="pw-tier-name">GOLD TIER</div><div class="pw-tier-rank">Top 15% · Bidness Club</div></div></div>
+      <div class="pw-xp"><div class="pw-xp-fill" style="width:81.7%"></div></div>
+      <div class="pw-xp-lbl"><span>2,450 XP</span><span>3,000 max</span></div>
+    </div>
+    <div class="streak"><div class="streak-num">🔥${streak}</div><div><div class="streak-lbl">Day Streak</div><div class="streak-sub">${streak > 1 ? 'Keep it going!' : 'Start trading daily!'}</div></div></div>
+    <div class="pw-stat"><div class="pw-stat-ico">🏆</div><div><div class="pw-stat-lbl">Equity Race</div><div class="pw-stat-val">#${rank}</div><div class="pw-stat-sub">Projected: ${projEq}%</div></div></div>
+    <div class="pw-stat"><div class="pw-stat-ico">💰</div><div><div class="pw-stat-lbl">Balance</div><div class="pw-stat-val">${bal}</div><div class="pw-stat-sub">${trades} trade${trades!==1?'s':''} placed</div></div></div>
+    <div class="pw-stat"><div class="pw-stat-ico">📈</div><div><div class="pw-stat-lbl">Accuracy</div><div class="pw-stat-val">${acc}%</div><div class="pw-stat-sub">Last ${Math.min(trades,30)} trades</div></div></div>
+    <div class="pw-mini-title">Top 3 Equity Race</div>
+    ${RANKED.slice(0,3).map(u=>{
+      const av=AVC[u.av%AVC.length];
+      return `<div class="pw-mini-row">
+        <span class="pw-mini-rank">#${u.rank}</span>
+        <div class="mini-av" style="background:${av};color:${u.av<=1?'#000':'#fff'};width:20px;height:20px;font-size:9px;">${u.ini}</div>
+        <span class="pw-mini-name">${u.name.split(' ')[0]}</span>
+        <span class="pw-mini-eq">${u.projectedEquity}%</span>
+      </div>`;
+    }).join('')}`;
+}
+
+// ═══════════════════════════════════
+// DASHBOARD MARKETS
+// ═══════════════════════════════════
+function renderMarkets(){
+  G('dashMarkets').innerHTML=MARKET_CARDS.map(m=>`
+    <div class="mkt-card">
+      <div class="mkt-cat-tag" style="background:${m.cc}22;color:${m.cc};">${m.icon} ${m.cat}</div>
+      <div class="mkt-q">${m.q}</div>
+      <div class="mkt-probs"><span style="color:var(--teal);">${m.yes}% YES</span><span style="color:var(--red);">${100-m.yes}% NO</span></div>
+      <div class="mkt-bar"><div class="mkt-yes" style="width:${m.yes}%"></div></div>
+      <div class="mkt-btns">
+        <button class="mkt-y" onclick="toast('✅','Opened YES trade — ${m.q.slice(0,28)}...')">BUY YES ${m.yes}¢</button>
+        <button class="mkt-n" onclick="toast('❌','Opened NO trade — ${m.q.slice(0,28)}...')">BUY NO ${100-m.yes}¢</button>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════
+// ACTIVITY FEED
+// ═══════════════════════════════════
+function renderFeed(){
+  const feed=G('dashFeed');if(!feed)return;
+  feed.innerHTML=FEED_EVENTS.map(e=>`
+    <div class="feed-item">
+      <div class="fi-text">${e.text}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
+        <div class="fi-time">${e.time}</div>
+        ${e.share?`<div class="fi-share">
+          <button class="fi-shr-btn" onclick="toast('📢','Shared!')">Share</button>
+          <button class="fi-shr-btn" onclick="toast('🔗','Copied!')">Copy</button>
+        </div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+const EXTRA_FEED=[
+  {text:'<strong>Yuki Tanaka</strong> placed <span class="fi-teal">$8,400</span> YES on France Group I 🌍',share:false},
+  {text:'<span class="fi-gold">NVIDIA probability +4%</span> in last 10 minutes 📊',share:true},
+  {text:'<strong>Aisha Okonkwo</strong> hit <span class="fi-purple">22-day streak</span> 🔥',share:false},
+  {text:'<strong>Diego Morales</strong> earned <span class="fi-gold">+180 XP</span> from Accuracy Elite',share:true},
+  {text:'New market: <span class="fi-teal">Will England win Group L?</span> — 64% YES',share:false},
+];
+let feedIdx=0;
+setInterval(()=>{
+  const feed=G('dashFeed');
+  if(!feed||!G('page-dashboard').classList.contains('active'))return;
+  const e=EXTRA_FEED[feedIdx++%EXTRA_FEED.length];
+  const d=document.createElement('div');d.className='feed-item';
+  d.innerHTML=`<div class="fi-text">${e.text}</div><div class="fi-time">just now</div>`;
+  feed.insertBefore(d,feed.firstChild);
+  while(feed.children.length>10)feed.removeChild(feed.lastChild);
+},7500);
+
+function renderMiniLB(){
+  const el=G('miniLB');if(!el)return;
+  el.innerHTML=RANKED.slice(0,5).map(u=>{
+    const av=AVC[u.av%AVC.length];
+    return `<div class="mini-lb-row">
+      <span style="font-family:var(--fm);font-size:9px;color:var(--text3);width:16px;">#${u.rank}</span>
+      <div class="mini-av" style="background:${av};color:${u.av<=1?'#000':'#fff'};width:24px;height:24px;font-size:10px;border-radius:6px;">${u.ini}</div>
+      <span class="mini-lb-name">${u.name.split(' ')[0]}</span>
+      <span class="mini-lb-score">${u.totalScore.toLocaleString()}</span>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════
+// USER PROFILE
+// ═══════════════════════════════════
+function setProfTab(tab,btn){
+  profTab=tab;
+  document.querySelectorAll('.pt').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');renderProfTab();
+}
+function renderProfTab(){
+  const el=G('profTabContent');
+  if(profTab==='history'){
+    el.innerHTML=`<table class="data-tbl"><thead><tr>${['Market','Side','Amount','Profit','Acc','Date'].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${[
+      ['Will Fed cut rates?','YES','$48,200','+$31,400','91%','May 22'],
+      ['Will AAPL close above $195?','YES','$24,000','+$12,800','87%','May 20'],
+      ['Will PSG win UCL Semi?','NO','$18,500','+$8,200','94%','May 14'],
+      ['Will BTC hit $95K?','YES','$32,000','+$18,600','82%','May 12'],
+      ['Will Sinner win French Open?','YES','$12,000','+$6,400','89%','May 10'],
+    ].map(r=>`<tr>${r.map((v,i)=>`<td style="color:${i===1?(v==='YES'?'var(--teal)':'var(--red)'):i===3?'var(--green)':'var(--text2)'}${i===1||i===3?';font-family:var(--fm)':''}">${v}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  } else if(profTab==='badges'){
+    el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;">${
+      BADGES.filter(b=>b.earned).map(b=>`
+        <div style="background:var(--bg2);border:1px solid rgba(0,232,200,0.2);border-radius:9px;padding:13px;text-align:center;cursor:pointer;" onclick='openBadgeModal(${JSON.stringify(b).replace(/"/g,"&quot;")})'>
+          <div style="font-size:24px;margin-bottom:5px;">${b.emoji}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text2);">${b.name}</div>
+        </div>`).join('')}
+    </div>`;
+  } else {
+    el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:11px;">${
+      ['Will S&P 500 hit 6,000 by Q3 2026?','Will Wimbledon be won by Alcaraz?','Will Fed cut rates in July 2026?'].map((q,i)=>{
+        const yes=[64,58,72][i];const vol=['$842K','$124K','$391K'][i];
+        return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:13px;">
+          <div style="font-size:12.5px;font-weight:600;margin-bottom:8px;line-height:1.4;">${q}</div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--fm);font-size:11.5px;margin-bottom:4px;">
+            <span style="color:var(--teal);">${yes}% YES</span><span style="color:var(--text3);">${vol} vol</span></div>
+          <div style="height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;">
+            <div style="height:100%;width:${yes}%;background:var(--teal);border-radius:2px;"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+}
+
+// ═══════════════════════════════════
+// HERO CANVAS
+// ═══════════════════════════════════
+function initCanvas(){
+  const cv=G('heroCanvas');if(!cv)return;
+  const ctx=cv.getContext('2d');
+  cv.width=cv.offsetWidth||window.innerWidth;cv.height=cv.offsetHeight||300;
+  const lines=Array.from({length:6},(_,i)=>({
+    pts:[],color:i%2===0?'#00e8c8':'#a855f7',speed:0.3+i*0.12,off:i*60
+  }));
+  lines.forEach(l=>{
+    let y=cv.height/2+l.off-180;
+    for(let x=0;x<=cv.width+20;x+=18){
+      y+=(Math.random()-0.5)*28;
+      l.pts.push({x,y:Math.max(10,Math.min(cv.height-10,y))});
+    }
+  });
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    lines.forEach(l=>{
+      l.pts.forEach(p=>p.x-=l.speed);
+      if(l.pts[0].x<-18){
+        l.pts.shift();
+        const last=l.pts[l.pts.length-1];
+        l.pts.push({x:last.x+18,y:Math.max(10,Math.min(cv.height-10,last.y+(Math.random()-0.5)*28))});
+      }
+      ctx.beginPath();ctx.moveTo(l.pts[0].x,l.pts[0].y);
+      for(let i=1;i<l.pts.length-2;i++){
+        const cpx=(l.pts[i].x+l.pts[i+1].x)/2,cpy=(l.pts[i].y+l.pts[i+1].y)/2;
+        ctx.quadraticCurveTo(l.pts[i].x,l.pts[i].y,cpx,cpy);
+      }
+      ctx.strokeStyle=l.color;ctx.lineWidth=1;ctx.stroke();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+// ═══════════════════════════════════
+// SHARED STATE — reads from index.html localStorage keys
+// ═══════════════════════════════════
+function loadRealUserData() {
+  try {
+    // Balance — written by index.html as 'bidness_balance'
+    const bal = parseFloat(localStorage.getItem('bidness_balance') || '10000');
+    const balFmt = '$' + bal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const balEl = G('eqBal');
+    if (balEl) balEl.textContent = '💰 ' + balFmt;
+
+    // Trades — written by index.html as 'bidness_trades'
+    const tradesRaw = localStorage.getItem('bidness_trades');
+    const trades = tradesRaw ? JSON.parse(tradesRaw) : [];
+    const tradeCount = trades.length;
+
+    // Positions — written by index.html as 'bidness_positions'
+    const posRaw = localStorage.getItem('bidness_positions');
+    const positions = posRaw ? JSON.parse(posRaw) : [];
+
+    // Calculate real user profit from positions
+    let realProfit = 0;
+    positions.forEach(p => {
+      // Rough mark-to-market: winning positions assumed 60% profitable
+      realProfit += p.totalCost * 0.15;
+    });
+    // Add resolved trade profit estimate
+    realProfit += tradeCount * 120;
+
+    // Calculate real accuracy from trade count (mock until real resolution data exists)
+    const realAccuracy = tradeCount > 10 ? Math.min(94, 65 + tradeCount * 0.3) : 72.0;
+
+    // Calculate real engagement score from streak in localStorage
+    const streak = parseInt(localStorage.getItem('bidness_streak') || '1');
+
+    // Build real user object
+    const realUser = {
+      name: 'You (Andrew)',
+      handle: '@andrew',
+      ini: 'AN',
+      av: 0,
+      profit: Math.round(realProfit),
+      accuracy: parseFloat(realAccuracy.toFixed(1)),
+      trades: tradeCount,
+      volume: trades.reduce((s, t) => s + (t.amount || 0), 0),
+      streak: streak,
+      tournaments: 0,
+      referrals: 0,
+      shares: 0,
+      marketsCreated: 0,
+      liquidityProvided: 0,
+      isRealUser: true,
+    };
+
+    // Inject real user into rankings
+    const existingIdx = RAW_USERS.findIndex(u => u.handle === '@andrew');
+    if (existingIdx >= 0) RAW_USERS[existingIdx] = realUser;
+    else RAW_USERS.push(realUser);
+
+    // Re-rank with real user included
+    const reranked = SE.rankUsers(RAW_USERS);
+    // Update global RANKED array
+    RANKED.length = 0;
+    reranked.forEach(u => RANKED.push(u));
+
+    // Find real user's rank
+    const myRank = RANKED.find(u => u.isRealUser);
+    const rankNum = myRank ? myRank.rank : 50;
+    const projEq = myRank ? myRank.projectedEquity : '0.0000';
+
+    // Update progress widget with real data
+    const pwStat = document.querySelector('.pw-stat-val');
+    if (pwStat && myRank) {
+      // Will be re-rendered by renderPW() with real data below
+    }
+
+    // Store for renderPW to use
+    window._realUser = { bal, balFmt, tradeCount, rankNum, projEq, streak, realAccuracy };
+
+    console.log(`[Equity] Real user: rank #${rankNum}, ${tradeCount} trades, balance ${balFmt}`);
+    return { rankNum, tradeCount, bal, projEq, streak };
+
+  } catch(e) {
+    console.warn('[Equity] Could not load real user data:', e.message);
+    return { rankNum: 47, tradeCount: 0, bal: 10000, projEq: '0.0000', streak: 1 };
+  }
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  // Load real user data FIRST — before rendering anything
+  const realData = loadRealUserData();
+
+  updateCD(); setInterval(updateCD, 1000);
+  renderLB(); renderChallenges(); renderTCards(); renderBadges();
+  renderPW(); renderMarkets(); renderFeed(); renderMiniLB(); renderProfTab();
+  setTimeout(initCanvas, 80);
+
+  // Re-render progress widget with real data
+  const pw = G('progressWidget');
+  if (pw && window._realUser) {
+    const u = window._realUser;
+    // Patch rank display
+    const rankEls = pw.querySelectorAll('.pw-stat-val');
+    if (rankEls[0]) rankEls[0].textContent = '#' + u.rankNum;
+    const subEls = pw.querySelectorAll('.pw-stat-sub');
+    if (subEls[0]) subEls[0].textContent = 'Projected: ' + u.projEq + '%';
+    // Patch balance
+    if (rankEls[1]) rankEls[1].textContent = u.balFmt;
+    // Patch streak
+    const streakEl = pw.querySelector('.streak-num');
+    if (streakEl) streakEl.textContent = '🔥' + u.streak;
+  }
+
+  // Toast with real data
+  const rank = realData.rankNum;
+  const trades = realData.tradeCount;
+  setTimeout(() => {
+    if (trades === 0) {
+      toast('🏆', 'You have <strong>no trades yet</strong> — start trading to enter the Equity Race!');
+    } else {
+      toast('🏆', `You are <strong>#${rank}</strong> in the Equity Race · ${trades} trade${trades!==1?'s':''} placed`);
+    }
+  }, 1200);
+  setTimeout(() => toast('📋', 'Click <strong>Equity Rules</strong> to see how scoring works'), 3800);
+});
+</script>
+</body>
+</html>
