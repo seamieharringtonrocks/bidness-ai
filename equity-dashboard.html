@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bidness.ai — Equity Race Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Cabinet+Grotesk:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:#080b0f;--bg2:#0d1117;--bg3:#121820;--bg4:#1a2332;--bg5:#202d3d;
@@ -15,7 +15,7 @@
   --red:#ef4444;--green:#22c55e;
   --text:#e2e8f0;--text2:#64748b;--text3:#334155;
   --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
-  --fd:'Bebas Neue',sans-serif;--fm:'DM Mono',monospace;--fb:'Cabinet Grotesk',sans-serif;
+  --fd:'Bebas Neue',sans-serif;--fm:'DM Mono',monospace;--fb:'Plus Jakarta Sans',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100vh;}
@@ -745,7 +745,7 @@ const RAW_USERS=[
   {name:'Lena Müller',     handle:'@lena_pred',   ini:'LM',av:4,profit:52000,  accuracy:76.9,trades:128, volume:1400000, streak:4, tournaments:3, referrals:1, shares:14, marketsCreated:0, liquidityProvided:20000},
   {name:'Tomás García',    handle:'@tg_markets',  ini:'TG',av:5,profit:44000,  accuracy:75.3,trades:112, volume:1200000, streak:3, tournaments:3, referrals:0, shares:12, marketsCreated:1, liquidityProvided:15000},
 ];
-const RANKED=SE.rankUsers(RAW_USERS);
+let RANKED=SE.rankUsers(RAW_USERS);
 
 const CHALLENGES=[
   {name:'7-Day Streak',       reward:'+350 XP', progress:71,goal:7,  done:5,  desc:'days active'},
