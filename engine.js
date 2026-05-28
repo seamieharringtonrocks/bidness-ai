@@ -361,8 +361,8 @@
     // Update data source display — R2
     const sources = [...new Set(results.map(m=>m.dataSource))];
     const el = id => document.getElementById(id);
-    if(el('dStS')) el('dStS').textContent = sources.join(' + ');
-    if(el('actDSrc')) el('actDSrc').textContent = sources.join(' + ');
+    if(el('dStS')) el('dStS').textContent = sources.join(' + ') + ' · openfootball';
+    if(el('actDSrc')) el('actDSrc').textContent = sources.join(' + ') + ' · openfootball';
   }
 
   // ─────────────────────────────────────────────
@@ -486,6 +486,124 @@
   // STEP 5 — ESPN POLLING (R5 R6 R13 R17)
   // ─────────────────────────────────────────────
 
+  // ─────────────────────────────────────────────
+  // OPENFOOTBALL — primary sports data source
+  // GitHub raw files: open, free, no key, real CORS
+  // ─────────────────────────────────────────────
+  const OPENFOOTBALL = 'https://raw.githubusercontent.com/openfootball/football.json/master/2025-26';
+
+  const OPENFOOTBALL_MAP = {
+    'eng_premier_league':  'en.1.json',
+    'sco_premiership':     'sco.1.json',
+    'esp_laliga':          'es.1.json',
+    'ger_bundesliga':      'de.1.json',
+    'ita_seriea':          'it.1.json',
+    'fra_ligue1':          'fr.1.json',
+  };
+
+  // Cache fetched league data to avoid repeat requests
+  const ofbCache = {};
+
+  async function fetchOpenFootball(tournamentId) {
+    if (ofbCache[tournamentId]) return ofbCache[tournamentId];
+    const file = OPENFOOTBALL_MAP[tournamentId];
+    if (!file) return null;
+    // openfootball raw files have open CORS — no proxy needed
+    const url = `${OPENFOOTBALL}/${file}`;
+    try {
+      const data = await safeFetch(url, 10000);
+      ofbCache[tournamentId] = data;
+      return data;
+    } catch(e) {
+      console.warn(`[Engine] openfootball failed for ${tournamentId}:`, e.message);
+      return null;
+    }
+  }
+
+  /** Parse openfootball match into our standard format */
+  function parseOFBMatch(m, tournamentId, tournamentName, icon) {
+    const score = m.score;
+    const hasResult = score && Array.isArray(score.ft) && score.ft.length === 2;
+    const dateStr = m.date || null;
+    const homeElo = E.config?.fifa_team_elo?.teams?.[m.team1] || 1700;
+    const awayElo = E.config?.fifa_team_elo?.teams?.[m.team2] || 1650;
+    const prob = footballProbabilityWeighted(homeElo, awayElo, { isKnockout: false },
+      E.config?.model_weights?.football_league);
+    const yes = Math.min(89, Math.max(11, Math.round(prob * 100)));
+
+    return {
+      id: `${tournamentId}_${(m.team1 + m.team2).replace(/[^a-zA-Z]/g,'')}`,
+      tournamentId,
+      q: `Will ${m.team1} beat ${m.team2}? (${tournamentName})`,
+      cat: 'Sports',
+      icon,
+      homeTeam: m.team1,
+      awayTeam: m.team2,
+      yes, no: 100 - yes,
+      vol: '$' + (Math.random() * 5 + 0.5).toFixed(1) + 'M',
+      liq: '$' + (Math.random() * 2 + 0.2).toFixed(1) + 'M',
+      closes: formatLocalDate(dateStr),
+      closesISO: dateStr,
+      suspended: false,
+      resolved: hasResult,
+      result: hasResult ? (score.ft[0] > score.ft[1] ? 'YES' : 'NO') : null,
+      finalScore: hasResult ? { home: m.team1, away: m.team2, homeScore: score.ft[0], awayScore: score.ft[1] } : null,
+      dataSource: 'openfootball',
+      round: m.round || null,
+      tournament: tournamentName,
+      model: {
+        homeTeam: m.team1,
+        awayTeam: m.team2,
+        source: 'openfootball (GitHub) + FIFA Elo',
+        probability: yes + '%',
+      }
+    };
+  }
+
+  /** Get upcoming fixtures from openfootball data — next N unplayed matches */
+  function getUpcomingFixtures(data, limit = 8) {
+    if (!data?.matches) return [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return data.matches
+      .filter(m => {
+        const hasResult = m.score && Array.isArray(m.score?.ft) && m.score.ft.length === 2;
+        if (hasResult) return false;
+        if (!m.date) return true; // include undated upcoming
+        return new Date(m.date) >= today;
+      })
+      .slice(0, limit);
+  }
+
+  /** Get recent results from openfootball — last N played matches */
+  function getRecentResults(data, limit = 5) {
+    if (!data?.matches) return [];
+    return data.matches
+      .filter(m => m.score && Array.isArray(m.score?.ft) && m.score.ft.length === 2)
+      .slice(-limit);
+  }
+
+  /** Get league standings approximation from results */
+  function buildStandings(data) {
+    if (!data?.matches) return [];
+    const teams = {};
+    data.matches.forEach(m => {
+      if (!m.score?.ft) return;
+      const [hg, ag] = m.score.ft;
+      if (!teams[m.team1]) teams[m.team1] = { name: m.team1, w: 0, d: 0, l: 0, gf: 0, ga: 0 };
+      if (!teams[m.team2]) teams[m.team2] = { name: m.team2, w: 0, d: 0, l: 0, gf: 0, ga: 0 };
+      teams[m.team1].gf += hg; teams[m.team1].ga += ag;
+      teams[m.team2].gf += ag; teams[m.team2].ga += hg;
+      if (hg > ag) { teams[m.team1].w++; teams[m.team2].l++; }
+      else if (hg < ag) { teams[m.team2].w++; teams[m.team1].l++; }
+      else { teams[m.team1].d++; teams[m.team2].d++; }
+    });
+    return Object.values(teams)
+      .map(t => ({ ...t, pts: t.w * 3 + t.d, gd: t.gf - t.ga }))
+      .sort((a, b) => b.pts - a.pts || b.gd - a.gd);
+  }
+
+  // Keep ESPN functions but mark as secondary/fallback
   async function fetchESPN(sport, league, endpoint='scoreboard') {
     const url = px(`${ESPN}/${sport}/${league}/${endpoint}`);
     return await safeFetch(url, 9000);
@@ -516,79 +634,79 @@
     } catch { return null; }
   }
 
-  /** R17: 15-min scan — withdrawals, postponements, finals only */
+  /** R17: 15-min scan — refresh openfootball data, check for resolved matches */
   async function espnPoll() {
     if (!E.config?.tournaments) return;
-    const active = E.config.tournaments.filter(t=>t.active && t.espn_sport && !t.coming_soon);
-    console.log(`[Engine] R17: ESPN poll — ${active.length} tournaments`);
+    const active = E.config.tournaments.filter(t=>t.active && !t.coming_soon);
+    console.log(`[Engine] R17: 15-min scan — ${active.length} tournaments`);
 
-    for (const t of active) {
+    // Refresh openfootball cache for leagues
+    for (const t of active.filter(t => OPENFOOTBALL_MAP[t.id])) {
       try {
-        const data = await fetchESPN(t.espn_sport, t.espn_league);
-        if (!data?.events) continue;
+        delete ofbCache[t.id]; // clear cache to force fresh fetch
+        const data = await fetchOpenFootball(t.id);
+        if (data) {
+          // Update standings
+          E.standings = E.standings || {};
+          E.standings[t.id] = buildStandings(data);
 
-        for (const event of data.events) {
-          const status = parseESPNStatus(event);
-          const teams  = parseESPNTeams(event);
-          if (!teams) continue;
-          const mktId = `${t.id}_${event.id}`;
-          const market = E.sportsMarkets.find(m=>m.espnEventId===event.id||m.id===mktId);
-
-          // R5: Suspend at kick-off
-          if (status==='in_progress' && market && !market.suspended) {
-            market.suspended = true;
-            market.suspendReason = 'in_progress';
-            market.liveScore = teams;
-            emit('market_suspended', market);
-            console.log(`[Engine] R5: Suspended ${market.q}`);
-          }
-
-          // R5 R9: Auto-resolve on final
-          if (status==='final' && market && !market.resolved) {
-            market.resolved = true;
-            market.suspended = true;
-            market.result = teams.winner===market.homeTeam ? 'YES' : 'NO';
-            market.finalScore = teams;
-            market.suspendReason = 'result_pending'; // R6
-            payoutPositions(market.id, market.result);
-            emit('market_resolved', market);
-            // R13: Bracket auto-advance
-            if (t.type==='bracket' && teams.winner) advanceBracket(t, market, teams.winner);
-            console.log(`[Engine] R5/R9: Resolved ${market.q} → ${market.result}`);
-          }
-
-          // Flag postponements for admin (R17)
-          if (status==='postponed') {
-            const flag = { type:'postponed', name:event.name, tournamentId:t.id,
-                           detail:'Match postponed — market may be stale', eventId:event.id };
-            if (!E.flags.find(f=>f.eventId===event.id)) {
-              E.flags.push(flag);
-              emit('flag_added', flag);
-            }
-          }
-
-          // R6: Check for withdrawn players in tennis (scan event details)
-          if (t.sport==='tennis' && event.notes?.length) {
-            const withdrawal = event.notes.find(n=>n.type?.toLowerCase().includes('withdrawal')||n.headline?.toLowerCase().includes('retir'));
-            if (withdrawal && market) {
-              market.suspended = true;
-              market.suspendReason = 'withdrawal';
-              const flag = { type:'withdrawal', name:event.name, tournamentId:t.id,
-                             detail: withdrawal.headline||'Player withdrawal detected', eventId:event.id };
-              if (!E.flags.find(f=>f.eventId===event.id)) {
-                E.flags.push(flag); emit('flag_added', flag);
-              }
+          // Check for newly resolved matches
+          const resolved = getRecentResults(data, 10);
+          for (const m of resolved) {
+            const mktId = `${t.id}_${(m.team1 + m.team2).replace(/[^a-zA-Z]/g,'')}`;
+            const market = E.sportsMarkets.find(mk => mk.id === mktId);
+            if (market && !market.resolved) {
+              market.resolved = true;
+              market.result = m.score.ft[0] > m.score.ft[1] ? 'YES' : 'NO';
+              market.finalScore = { homeScore: m.score.ft[0], awayScore: m.score.ft[1] };
+              payoutPositions(market.id, market.result);
+              emit('market_resolved', market);
+              console.log(`[Engine] R9: Resolved ${market.q} → ${market.result}`);
             }
           }
         }
       } catch(e) {
+        console.warn(`[Engine] R2: openfootball refresh failed ${t.id}:`, e.message);
+      }
+    }
+
+    // ESPN still attempted for brackets (UCL etc) — may fail but try
+    for (const t of active.filter(t => !OPENFOOTBALL_MAP[t.id] && t.espn_sport)) {
+      try {
+        const data = await fetchESPN(t.espn_sport, t.espn_league);
+        if (!data?.events) continue;
+        for (const event of data.events) {
+          const status = parseESPNStatus(event);
+          const teams = parseESPNTeams(event);
+          if (!teams) continue;
+          const mktId = `${t.id}_${event.id}`;
+          const market = E.sportsMarkets.find(m=>m.espnEventId===event.id||m.id===mktId);
+
+          if (status==='in_progress' && market && !market.suspended) {
+            market.suspended = true; market.suspendReason = 'in_progress';
+            market.liveScore = teams; emit('market_suspended', market);
+          }
+          if (status==='final' && market && !market.resolved) {
+            market.resolved = true; market.suspended = true;
+            market.result = teams.winner===market.homeTeam ? 'YES' : 'NO';
+            market.finalScore = teams;
+            payoutPositions(market.id, market.result);
+            emit('market_resolved', market);
+            if (t.type==='bracket' && teams.winner) advanceBracket(t, market, teams.winner);
+          }
+          if (status==='postponed') {
+            const flag = { type:'postponed', name:event.name, tournamentId:t.id,
+                           detail:'Match postponed', eventId:event.id };
+            if (!E.flags.find(f=>f.eventId===event.id)) { E.flags.push(flag); emit('flag_added', flag); }
+          }
+        }
+      } catch(e) {
         console.warn(`[Engine] R2: ESPN poll failed ${t.id}:`, e.message);
-        // Graceful degradation — continue with next tournament
       }
     }
 
     const el = document.getElementById('lastScan');
-    if (el) el.textContent = 'Last scan: '+new Date().toLocaleTimeString();
+    if (el) el.textContent = 'Last scan: ' + new Date().toLocaleTimeString();
     E.scanCountdown = 900;
     emit('scan_complete', { timestamp: Date.now(), flags: E.flags.length });
   }
@@ -635,69 +753,33 @@
    */
   async function buildSportsMarketsForTournament(t) {
     const markets = [];
-    if (t.coming_soon) return markets; // Golf placeholder — skip
-
-    // Try ESPN for live/upcoming fixtures first
-    let espnEvents = [];
-    try {
-      const data = await fetchESPN(t.espn_sport, t.espn_league);
-      espnEvents = data?.events || [];
-    } catch(e) {
-      console.warn(`[Engine] ESPN failed for ${t.id}, using config fixtures (R2):`, e.message);
-    }
+    if (t.coming_soon) return markets;
 
     if (t.type==='league') {
       // R14: League per-matchday markets
-      // Use ESPN events if available, fall back to config fixtures
-      const fixtures = espnEvents.length > 0
-        ? espnEvents.filter(e=>['scheduled','in_progress'].includes(parseESPNStatus(e))).slice(0,8)
-        : null;
+      // PRIMARY: openfootball (GitHub raw — real CORS, no key, real data)
+      // FALLBACK: config fixtures from tournaments.json
+      let upcoming = [];
+      let leagueData = null;
 
-      if (fixtures && fixtures.length) {
-        for (const event of fixtures) {
-          const teams = parseESPNTeams(event);
-          if (!teams) continue;
-          const status = parseESPNStatus(event);
-          // Fetch real Elo ratings from club-elo.com
-          const [homeElo, awayElo] = await Promise.all([
-            fetchClubElo(teams.home),
-            fetchClubElo(teams.away),
-          ]);
-          const prob = footballProbabilityWeighted(homeElo, awayElo,
-            { isKnockout:false }, E.config?.model_weights?.football_league);
-          const yes = Math.min(89, Math.max(11, Math.round(prob*100)));
-
-          markets.push({
-            id: `${t.id}_${event.id}`,
-            espnEventId: event.id,
-            tournamentId: t.id,
-            q: `Will ${teams.home} beat ${teams.away}? (${t.short_name})`,
-            cat:'Sports', icon:t.icon,
-            homeTeam:teams.home, awayTeam:teams.away,
-            yes, no:100-yes,
-            vol:'$'+( Math.random()*5+0.5).toFixed(1)+'M',
-            liq:'$'+(Math.random()*2+0.2).toFixed(1)+'M',
-            closes: formatLocalDate(event.date),       // R4
-            closesISO: event.date || null,
-            suspended: status==='in_progress',
-            suspendReason: status==='in_progress' ? 'in_progress' : null,
-            resolved: false,
-            liveScore: status==='in_progress' ? teams : null,
-            dataSource: 'espn',
-            tournament: t.name,
-            model: {
-              homeTeam:teams.home, homeElo:Math.round(homeElo),
-              awayTeam:teams.away, awayElo:Math.round(awayElo),
-              eloProbability: Math.round(eloProbability(homeElo,awayElo)*100)+'%',
-              weightedProbability: yes+'%',
-              source:'club-elo.com + ESPN',
-              weights: 'R12: from tournaments.json model_weights.football_league',
-            }
-          });
+      if (OPENFOOTBALL_MAP[t.id]) {
+        leagueData = await fetchOpenFootball(t.id);
+        if (leagueData) {
+          upcoming = getUpcomingFixtures(leagueData, 8);
+          console.log(`[Engine] openfootball ${t.id}: ${upcoming.length} upcoming fixtures`);
         }
-      } else if (t.fixtures) {
-        // R12: Fall back to config fixtures with FIFA Elo for international
-        for (const f of t.fixtures.slice(0,6)) {
+      }
+
+      if (upcoming.length) {
+        // Build markets from real openfootball fixtures
+        for (const m of upcoming) {
+          const market = parseOFBMatch(m, t.id, t.name, t.icon);
+          markets.push(market);
+        }
+      } else if (t.fixtures?.length) {
+        // Fallback: config fixtures
+        console.warn(`[Engine] R2: ${t.id} using config fixtures`);
+        for (const f of t.fixtures.slice(0, 6)) {
           const homeElo = E.config?.fifa_team_elo?.teams?.[f.home] || 1700;
           const awayElo = E.config?.fifa_team_elo?.teams?.[f.away] || 1650;
           const prob = footballProbabilityWeighted(homeElo, awayElo, {isKnockout:false});
@@ -714,6 +796,12 @@
                    source:'Config fixtures + FIFA Elo (R12)'}
           });
         }
+      }
+
+      // Store standings in engine state for display
+      if (leagueData) {
+        E.standings = E.standings || {};
+        E.standings[t.id] = buildStandings(leagueData);
       }
     } else if (t.type==='bracket') {
       // Bracket tournament — build markets from config bracket + ESPN
@@ -845,25 +933,56 @@
     return E.config.tournaments.map(t => {
       const tMkts = E.sportsMarkets.filter(m=>m.tournamentId===t.id);
 
-      // R15: curated display — group fixtures, limit display
-      let displayFixtures = tMkts.slice(0,6).map(m=>({
+      // R15: curated display
+      let displayFixtures = tMkts.filter(m=>!m.resolved).slice(0,6).map(m=>({
         home:m.homeTeam, away:m.awayTeam, homeProb:m.yes,
         date:m.closes, status:m.suspended?'in_progress':'open',
         liveScore:m.liveScore||null,
       }));
 
-      // Season winner probabilities for leagues (derived from Elo)
+      // Real standings from openfootball (for leagues)
       let seasonWinner = t.seasonWinner || null;
+      if (t.type==='league' && E.standings?.[t.id]) {
+        const top = E.standings[t.id].slice(0, 4);
+        const topPts = top[0]?.pts || 1;
+        seasonWinner = top.map(team => ({
+          team: team.name,
+          prob: Math.round((team.pts / topPts) * 100 * 0.7 + 30), // relative probability
+          color: '#00e8c8',
+          pts: team.pts,
+          real: true,
+        }));
+      }
 
-      // World Cup: group by group letter
+      // World Cup: group by group letter from config group_stage_fixtures
       let groupFixtures = null;
       if (t.group_stage_fixtures) {
         const groups = {};
-        const upcomingMkts = tMkts.filter(m=>!m.resolved&&!m.suspended);
-        upcomingMkts.forEach(m => {
-          if (!groups[m.group]) groups[m.group] = [];
-          groups[m.group].push(m);
-        });
+        // Use live engine markets if available, else build from config fixtures
+        const liveMkts = E.sportsMarkets.filter(m=>m.tournamentId===t.id&&!m.resolved);
+        if (liveMkts.length) {
+          liveMkts.forEach(m => {
+            if (!groups[m.group]) groups[m.group] = [];
+            groups[m.group].push(m);
+          });
+        } else {
+          // Build display objects from raw config fixtures
+          t.group_stage_fixtures.forEach(f => {
+            const g = f.group;
+            if (!groups[g]) groups[g] = [];
+            const homeElo = E.config?.fifa_team_elo?.teams?.[f.home] || 1700;
+            const awayElo = E.config?.fifa_team_elo?.teams?.[f.away] || 1650;
+            const prob = footballProbabilityWeighted(homeElo, awayElo, {isKnockout:false});
+            const yes = Math.min(89, Math.max(11, Math.round(prob*100)));
+            groups[g].push({
+              id: `${t.id}_${f.home.replace(/ /g,'_')}_${f.away.replace(/ /g,'_')}`,
+              homeTeam: f.home, awayTeam: f.away,
+              yes, closes: f.date || 'Jun 2026',
+              group: g, suspended: false, resolved: false,
+              dataSource: 'config',
+            });
+          });
+        }
         groupFixtures = groups;
       }
 
@@ -872,7 +991,8 @@
         activeMarkets: tMkts.filter(m=>!m.resolved).length,
         fixtures: displayFixtures,
         seasonWinner,
-        groupFixtures, // World Cup grouped display
+        groupFixtures,
+        // bracket comes from tournaments.json config directly
         bracket: t.bracket || [],
       };
     });

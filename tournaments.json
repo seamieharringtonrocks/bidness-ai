@@ -178,7 +178,22 @@
       },
       "auto_advance": true,
       "model": "football_knockout",
-      "notes": "UEFA Champions League. Auto-advances bracket on result."
+      "notes": "UEFA Champions League. Auto-advances bracket on result.",
+      "bracket": [
+        {
+          "round": "Final",
+          "matches": [
+            {
+              "home": "PSG",
+              "away": "Arsenal",
+              "homeProb": 52,
+              "date": "2026-05-30",
+              "status": "open",
+              "venue": "Pusk\u00e1s Ar\u00e9na, Budapest"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "uefa_europa_league",
@@ -207,7 +222,23 @@
       },
       "auto_advance": true,
       "model": "football_knockout",
-      "notes": "UEFA Europa League."
+      "notes": "UEFA Europa League.",
+      "bracket": [
+        {
+          "round": "Final",
+          "matches": [
+            {
+              "home": "Aston Villa",
+              "away": "Freiburg",
+              "homeProb": 100,
+              "date": "2026-05-20",
+              "status": "resolved",
+              "winner": "Aston Villa",
+              "venue": "Be\u015fikta\u015f Stadium, Istanbul"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "fifa_world_cup",
@@ -820,6 +851,20 @@
           "date": "Jun 27",
           "venue": "Los Angeles"
         }
+      ],
+      "bracket": [
+        {
+          "round": "Round of 32",
+          "matches": [
+            {
+              "home": "TBD",
+              "away": "TBD",
+              "homeProb": 50,
+              "date": "2026-06-28",
+              "status": "pending"
+            }
+          ]
+        }
       ]
     },
     {
@@ -927,7 +972,40 @@
       },
       "auto_advance": true,
       "model": "tennis_grand_slam",
-      "notes": "Clay court Grand Slam. May-June. Paris. Surface win rate carries highest weight."
+      "notes": "Clay court Grand Slam. May-June. Paris. Surface win rate carries highest weight.",
+      "bracket": [
+        {
+          "round": "Semi Finals",
+          "matches": [
+            {
+              "home": "Alcaraz",
+              "away": "Djokovic",
+              "homeProb": 54,
+              "date": "2026-06-06",
+              "status": "open"
+            },
+            {
+              "home": "Sinner",
+              "away": "Ruud",
+              "homeProb": 63,
+              "date": "2026-06-06",
+              "status": "open"
+            }
+          ]
+        },
+        {
+          "round": "Final",
+          "matches": [
+            {
+              "home": "TBD",
+              "away": "TBD",
+              "homeProb": 50,
+              "date": "2026-06-08",
+              "status": "pending"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "tennis_wimbledon",
@@ -966,7 +1044,21 @@
       },
       "auto_advance": true,
       "model": "tennis_grand_slam",
-      "notes": "Grass court Grand Slam. July. London."
+      "notes": "Grass court Grand Slam. July. London.",
+      "bracket": [
+        {
+          "round": "First Round",
+          "matches": [
+            {
+              "home": "TBD",
+              "away": "TBD",
+              "homeProb": 50,
+              "date": "2026-07-01",
+              "status": "pending"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "tennis_us_open",
@@ -1005,7 +1097,21 @@
       },
       "auto_advance": true,
       "model": "tennis_grand_slam",
-      "notes": "Hard court Grand Slam. August-September. New York."
+      "notes": "Hard court Grand Slam. August-September. New York.",
+      "bracket": [
+        {
+          "round": "First Round",
+          "matches": [
+            {
+              "home": "TBD",
+              "away": "TBD",
+              "homeProb": 50,
+              "date": "2026-08-31",
+              "status": "pending"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "tennis_monte_carlo",

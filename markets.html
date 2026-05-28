@@ -856,19 +856,13 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
 // ═══════════════════════════════════════════
 if (!window.BidnessEngine) {
   window.BidnessEngine = {
-    ready: false, dataSource: 'stub',
-    getFinancialMarkets: () => MOCK_FIN,
+    ready: false, dataSource: 'loading',
+    getFinancialMarkets: () => [],
     getSportsMarkets:    () => [],
-    getTournaments:      () => MOCK_TOURNAMENTS,
-    getLeaderboard:      () => MOCK_TRADERS,
-    onTrade: (id, side, amt) => {
-      const m = MOCK_FIN.find(x => x.id === id);
-      if (m) {
-        const d = (amt / 100000) * 2.5;
-        m.yes = Math.min(69, Math.max(31, Math.round(side === 'YES' ? m.yes + d : m.yes - d)));
-      }
-    },
-    getFlags:        () => MOCK_FLAGS,
+    getTournaments:      () => [],
+    getLeaderboard:      () => [],
+    onTrade: () => {},
+    getFlags:        () => [],
     manualScan:      async () => {},
     getScanCountdown:() => 900,
     _stub: true,
@@ -896,89 +890,13 @@ const AVC = [
   'linear-gradient(135deg,#00c896,#9b72f5)',
 ];
 
-const MOCK_FIN = [
-  {id:'jpm',  ticker:'JPM',   q:'Will JPM close above $220 by month end?',       cat:'Finance', icon:'🏦',yes:58,vol:'$12.4M',liq:'$3.2M',closes:'May 30',days:3,exchange:'NYSE',   suspended:false,model:{currentPrice:'$214.80',targetPrice:'$220.00',distance:'+2.4%',dailyVol:'1.8% daily',monthlyVol:'8.2% monthly',annualDrift:'+18.1% annualised',tradingDaysLeft:3,historicWinRate:'52%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'gs',   ticker:'GS',    q:'Will GS close above $480 by month end?',         cat:'Finance', icon:'💰',yes:61,vol:'$8.7M', liq:'$2.4M',closes:'May 30',days:3,exchange:'NYSE',   suspended:false,model:{currentPrice:'$468.20',targetPrice:'$480.00',distance:'+2.5%',dailyVol:'1.9% daily',monthlyVol:'8.7% monthly',annualDrift:'+21.2% annualised',tradingDaysLeft:3,historicWinRate:'54%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'xom',  ticker:'XOM',   q:'Will XOM close above $120 by month end?',        cat:'Energy',  icon:'⛽',yes:47,vol:'$4.1M', liq:'$1.4M',closes:'May 30',days:3,exchange:'NYSE',   suspended:false,model:{currentPrice:'$116.40',targetPrice:'$120.00',distance:'+3.1%',dailyVol:'1.5% daily',monthlyVol:'6.9% monthly',annualDrift:'+8.4% annualised',tradingDaysLeft:3,historicWinRate:'43%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'jnj',  ticker:'JNJ',   q:'Will JNJ close above $165 by month end?',        cat:'Healthcare',icon:'💊',yes:44,vol:'$3.8M',liq:'$1.3M',closes:'May 30',days:3,exchange:'NYSE',  suspended:false,model:{currentPrice:'$161.20',targetPrice:'$165.00',distance:'+2.4%',dailyVol:'0.9% daily',monthlyVol:'4.1% monthly',annualDrift:'+5.2% annualised',tradingDaysLeft:3,historicWinRate:'39%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'aapl', ticker:'AAPL',  q:'Will AAPL close above $200 by month end?',       cat:'Tech',    icon:'🍎',yes:63,vol:'$22.1M',liq:'$6.8M',closes:'May 30',days:3,exchange:'NASDAQ', suspended:false,model:{currentPrice:'$196.40',targetPrice:'$200.00',distance:'+1.8%',dailyVol:'1.2% daily',monthlyVol:'5.5% monthly',annualDrift:'+16.8% annualised',tradingDaysLeft:3,historicWinRate:'58%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'nvda', ticker:'NVDA',  q:'Will NVDA close above $1,100 by month end?',     cat:'Tech',    icon:'🖥', yes:56,vol:'$31.4M',liq:'$9.2M',closes:'May 30',days:3,exchange:'NASDAQ', suspended:false,model:{currentPrice:'$1,064',targetPrice:'$1,100',distance:'+3.4%',dailyVol:'3.1% daily',monthlyVol:'14.2% monthly',annualDrift:'+41.8% annualised',tradingDaysLeft:3,historicWinRate:'51%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'msft', ticker:'MSFT',  q:'Will MSFT close above $420 by month end?',       cat:'Tech',    icon:'🪟',yes:67,vol:'$18.6M',liq:'$5.1M',closes:'May 30',days:3,exchange:'NASDAQ', suspended:false,model:{currentPrice:'$412.80',targetPrice:'$420.00',distance:'+1.7%',dailyVol:'1.1% daily',monthlyVol:'5.0% monthly',annualDrift:'+18.1% annualised',tradingDaysLeft:3,historicWinRate:'61%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'googl',ticker:'GOOGL', q:'Will GOOGL close above $180 by month end?',      cat:'Tech',    icon:'🔍',yes:62,vol:'$14.2M',liq:'$4.3M',closes:'May 30',days:3,exchange:'NASDAQ', suspended:false,model:{currentPrice:'$175.60',targetPrice:'$180.00',distance:'+2.5%',dailyVol:'1.4% daily',monthlyVol:'6.4% monthly',annualDrift:'+14.2% annualised',tradingDaysLeft:3,historicWinRate:'55%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'amzn', ticker:'AMZN',  q:'Will AMZN close above $190 by month end?',       cat:'Tech',    icon:'📦',yes:58,vol:'$16.8M',liq:'$4.9M',closes:'May 30',days:3,exchange:'NASDAQ', suspended:false,model:{currentPrice:'$184.20',targetPrice:'$190.00',distance:'+3.1%',dailyVol:'1.6% daily',monthlyVol:'7.3% monthly',annualDrift:'+19.4% annualised',tradingDaysLeft:3,historicWinRate:'52%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'spy',  ticker:'SPY',   q:'Will S&P 500 ETF close above 5,800 by month end?',cat:'Macro',  icon:'📈',yes:54,vol:'$9.4M', liq:'$3.1M',closes:'May 30',days:3,exchange:'NYSE',   suspended:false,model:{currentPrice:'$5,648',targetPrice:'$5,800',distance:'+2.7%',dailyVol:'0.8% daily',monthlyVol:'3.7% monthly',annualDrift:'+11.2% annualised',tradingDaysLeft:3,historicWinRate:'48%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'qqq',  ticker:'QQQ',   q:'Will NASDAQ 100 ETF close above 500 by month end?',cat:'Macro', icon:'💹',yes:59,vol:'$11.2M',liq:'$3.8M',closes:'May 30',days:3,exchange:'NASDAQ', suspended:false,model:{currentPrice:'$484.60',targetPrice:'$500.00',distance:'+3.2%',dailyVol:'1.0% daily',monthlyVol:'4.6% monthly',annualDrift:'+13.8% annualised',tradingDaysLeft:3,historicWinRate:'53%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'gld',  ticker:'GLD',   q:'Will Gold ETF close above $240 by month end?',   cat:'Macro',   icon:'🥇',yes:48,vol:'$5.6M', liq:'$1.9M',closes:'May 30',days:3,exchange:'NYSE',   suspended:false,model:{currentPrice:'$234.10',targetPrice:'$240.00',distance:'+2.5%',dailyVol:'0.7% daily',monthlyVol:'3.2% monthly',annualDrift:'+7.1% annualised',tradingDaysLeft:3,historicWinRate:'44%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'tlt',  ticker:'TLT',   q:'Will 20Y Treasury ETF close above $95 by month end?',cat:'Macro',icon:'🏛',yes:41,vol:'$3.2M',liq:'$1.1M',closes:'May 30',days:3,exchange:'NASDAQ', suspended:false,model:{currentPrice:'$92.40',targetPrice:'$95.00',distance:'+2.8%',dailyVol:'0.6% daily',monthlyVol:'2.7% monthly',annualDrift:'-1.2% annualised',tradingDaysLeft:3,historicWinRate:'37%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-  {id:'btc',  ticker:'BTC-USD',q:'Will Bitcoin close above $100K by month end?', cat:'Crypto',   icon:'₿', yes:38,vol:'$28.7M',liq:'$7.8M',closes:'May 30',days:3,exchange:'Binance', suspended:false,model:{currentPrice:'$94,200',targetPrice:'$100,000',distance:'+6.2%',dailyVol:'3.8% daily',monthlyVol:'17.4% monthly',annualDrift:'+42.1% annualised',tradingDaysLeft:3,historicWinRate:'32%',dataPoints:'252 daily closes',source:'Binance public API',targetAdjusted:'No'}},
-  {id:'eth',  ticker:'ETH-USD',q:'Will Ethereum close above $4,000 by month end?',cat:'Crypto',  icon:'⟠', yes:44,vol:'$15.6M',liq:'$5.2M',closes:'May 30',days:3,exchange:'Binance', suspended:false,model:{currentPrice:'$3,720',targetPrice:'$4,000',distance:'+7.5%',dailyVol:'4.1% daily',monthlyVol:'18.8% monthly',annualDrift:'+38.4% annualised',tradingDaysLeft:3,historicWinRate:'38%',dataPoints:'252 daily closes',source:'Binance public API',targetAdjusted:'No'}},
-  {id:'brkb', ticker:'BRK-B', q:'Will BRK-B hit a new 52-week high by month end?',cat:'Finance', icon:'🏢',yes:34,vol:'$2.8M', liq:'$0.9M',closes:'May 30',days:3,exchange:'NYSE',   suspended:false,model:{currentPrice:'$411.20',targetPrice:'$420.00',distance:'+2.1%',dailyVol:'0.8% daily',monthlyVol:'3.7% monthly',annualDrift:'+9.8% annualised',tradingDaysLeft:3,historicWinRate:'30%',dataPoints:'252 daily closes',source:'Yahoo Finance (cors=true)',targetAdjusted:'No'}},
-];
+const MOCK_FIN = []; // R23: No mock data — engine.js fetches live prices
 
-const MOCK_FLAGS = [
-  {type:'withdrawal',name:'Roland Garros SF',detail:'Djokovic withdrew — market may be obsolete'},
-  {type:'data_gap',name:'Bundesliga Week 34',detail:'ESPN fixture data not yet available'},
-];
+const MOCK_FLAGS = [];
 
-const MOCK_TOURNAMENTS = [
-  {id:'eng_premier_league',name:'Premier League',short_name:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — Arsenal champions',activeMarkets:0,
-   seasonWinner:[{team:'Arsenal',prob:100,color:'#EF0107'},{team:'Man City',prob:0,color:'#6CABDD'},{team:'Liverpool',prob:0,color:'#C8102E'},{team:'Chelsea',prob:0,color:'#034694'}],
-   fixtures:[]},
-  {id:'sco_premiership',name:'Scottish Premiership',short_name:'Scottish Prem',flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — Celtic champions',activeMarkets:0,
-   seasonWinner:[{team:'Celtic',prob:100,color:'#16A734'},{team:'Rangers',prob:0,color:'#1B458F'},{team:'Hearts',prob:0,color:'#8B0000'}],
-   fixtures:[]},
-  {id:'fra_ligue1',name:'Ligue 1',short_name:'Ligue 1',flag:'🇫🇷',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — PSG champions',activeMarkets:0,
-   seasonWinner:[{team:'PSG',prob:100,color:'#004170'},{team:'Marseille',prob:0,color:'#009FC9'},{team:'Monaco',prob:0,color:'#ED1C24'}],
-   fixtures:[]},
-  {id:'esp_laliga',name:'La Liga',short_name:'La Liga',flag:'🇪🇸',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — Real Madrid champions',activeMarkets:0,
-   seasonWinner:[{team:'Real Madrid',prob:100,color:'#FEBE10'},{team:'Barcelona',prob:0,color:'#A50044'},{team:'Atletico',prob:0,color:'#CB3524'}],
-   fixtures:[]},
-  {id:'ita_seriea',name:'Serie A',short_name:'Serie A',flag:'🇮🇹',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — Inter Milan champions',activeMarkets:0,
-   seasonWinner:[{team:'Inter Milan',prob:100,color:'#0068A8'},{team:'AC Milan',prob:0,color:'#FB090B'},{team:'Juventus',prob:0,color:'#000000'}],
-   fixtures:[]},
-  {id:'ger_bundesliga',name:'Bundesliga',short_name:'Bundesliga',flag:'🇩🇪',icon:'⚽',sport:'football',type:'league',active:true,status:'✅ Season complete — Bayer Leverkusen champions',activeMarkets:0,
-   seasonWinner:[{team:'Bayer Leverkusen',prob:100,color:'#E32221'},{team:'Bayern Munich',prob:0,color:'#DC052D'},{team:'Dortmund',prob:0,color:'#FDE100'}],
-   fixtures:[]},
-  {id:'uefa_europa_league',name:'Europa League',short_name:'Europa League',flag:'🇪🇺',icon:'🏅',sport:'football',type:'bracket',active:true,status:'✅ Final resolved — Aston Villa won 3-0',activeMarkets:0,
-   bracket:[{round:'Final',matches:[{home:'Aston Villa',away:'Freiburg',homeProb:100,date:'2026-05-20',status:'resolved',winner:'Aston Villa',venue:'Beşiktaş Stadium, Istanbul'}]}]},
-  {id:'uefa_champions_league',name:'Champions League',short_name:'UCL',flag:'🇪🇺',icon:'🏆',sport:'football',type:'bracket',active:true,status:'⚽ Final — May 30, Puskás Aréna Budapest',activeMarkets:1,
-   bracket:[{round:'Final',matches:[{home:'PSG',away:'Arsenal',homeProb:52,date:'2026-05-30',status:'open',venue:'Puskás Aréna, Budapest'}]}]},
-  {id:'fifa_world_cup',name:'FIFA World Cup 2026',short_name:'World Cup',flag:'🌍',icon:'🏆',sport:'football',type:'bracket',active:true,status:'Group Stage — starts Jun 11',activeMarkets:24,
-   bracket:[{round:'Round of 32',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-06-28',status:'pending'}]}],
-   groupFixtures:{
-     'A':[{homeTeam:'Mexico',awayTeam:'South Africa',yes:69,closes:'Jun 11',suspended:false,resolved:false,id:'wc_mex_sou_A',group:'A'},{homeTeam:'South Korea',awayTeam:'Czechia',yes:68,closes:'Jun 11',suspended:false,resolved:false,id:'wc_sou_cze_A',group:'A'},{homeTeam:'Mexico',awayTeam:'South Korea',yes:60,closes:'Jun 15',suspended:false,resolved:false,id:'wc_mex_sou_A',group:'A'},{homeTeam:'Czechia',awayTeam:'South Africa',yes:48,closes:'Jun 15',suspended:false,resolved:false,id:'wc_cze_sou_A',group:'A'},{homeTeam:'Mexico',awayTeam:'Czechia',yes:73,closes:'Jun 25',suspended:false,resolved:false,id:'wc_mex_cze_A',group:'A'},{homeTeam:'South Africa',awayTeam:'South Korea',yes:43,closes:'Jun 25',suspended:false,resolved:false,id:'wc_sou_sou_A',group:'A'}],
-     'B':[{homeTeam:'Canada',awayTeam:'Bosnia and Herzegovina',yes:62,closes:'Jun 12',suspended:false,resolved:false,id:'wc_can_bos_B',group:'B'},{homeTeam:'Qatar',awayTeam:'Switzerland',yes:38,closes:'Jun 13',suspended:false,resolved:false,id:'wc_qat_swi_B',group:'B'},{homeTeam:'Canada',awayTeam:'Qatar',yes:57,closes:'Jun 16',suspended:false,resolved:false,id:'wc_can_qat_B',group:'B'},{homeTeam:'Bosnia and Herzegovina',awayTeam:'Switzerland',yes:33,closes:'Jun 16',suspended:false,resolved:false,id:'wc_bos_swi_B',group:'B'},{homeTeam:'Canada',awayTeam:'Switzerland',yes:42,closes:'Jun 26',suspended:false,resolved:false,id:'wc_can_swi_B',group:'B'},{homeTeam:'Bosnia and Herzegovina',awayTeam:'Qatar',yes:48,closes:'Jun 26',suspended:false,resolved:false,id:'wc_bos_qat_B',group:'B'}],
-     'C':[{homeTeam:'Brazil',awayTeam:'Morocco',yes:65,closes:'Jun 13',suspended:false,resolved:false,id:'wc_bra_mor_C',group:'C'},{homeTeam:'Haiti',awayTeam:'Scotland',yes:39,closes:'Jun 13',suspended:false,resolved:false,id:'wc_hai_sco_C',group:'C'},{homeTeam:'Brazil',awayTeam:'Haiti',yes:84,closes:'Jun 17',suspended:false,resolved:false,id:'wc_bra_hai_C',group:'C'},{homeTeam:'Morocco',awayTeam:'Scotland',yes:63,closes:'Jun 17',suspended:false,resolved:false,id:'wc_mor_sco_C',group:'C'},{homeTeam:'Brazil',awayTeam:'Scotland',yes:74,closes:'Jun 26',suspended:false,resolved:false,id:'wc_bra_sco_C',group:'C'},{homeTeam:'Morocco',awayTeam:'Haiti',yes:75,closes:'Jun 26',suspended:false,resolved:false,id:'wc_mor_hai_C',group:'C'}],
-     'D':[{homeTeam:'USA',awayTeam:'Paraguay',yes:69,closes:'Jun 12',suspended:false,resolved:false,id:'wc_usa_par_D',group:'D'},{homeTeam:'Australia',awayTeam:'Turkiye',yes:59,closes:'Jun 13',suspended:false,resolved:false,id:'wc_aus_tur_D',group:'D'},{homeTeam:'USA',awayTeam:'Australia',yes:62,closes:'Jun 16',suspended:false,resolved:false,id:'wc_usa_aus_D',group:'D'},{homeTeam:'Paraguay',awayTeam:'Turkiye',yes:52,closes:'Jun 16',suspended:false,resolved:false,id:'wc_par_tur_D',group:'D'},{homeTeam:'USA',awayTeam:'Turkiye',yes:68,closes:'Jun 27',suspended:false,resolved:false,id:'wc_usa_tur_D',group:'D'},{homeTeam:'Paraguay',awayTeam:'Australia',yes:46,closes:'Jun 27',suspended:false,resolved:false,id:'wc_par_aus_D',group:'D'}],
-     'E':[{homeTeam:'Germany',awayTeam:'Curacao',yes:84,closes:'Jun 14',suspended:false,resolved:false,id:'wc_ger_cur_E',group:'E'},{homeTeam:'Ivory Coast',awayTeam:'Ecuador',yes:47,closes:'Jun 16',suspended:false,resolved:false,id:'wc_ivo_ecu_E',group:'E'},{homeTeam:'Germany',awayTeam:'Ivory Coast',yes:72,closes:'Jun 19',suspended:false,resolved:false,id:'wc_ger_ivo_E',group:'E'},{homeTeam:'Curacao',awayTeam:'Ecuador',yes:31,closes:'Jun 19',suspended:false,resolved:false,id:'wc_cur_ecu_E',group:'E'},{homeTeam:'Germany',awayTeam:'Ecuador',yes:67,closes:'Jun 27',suspended:false,resolved:false,id:'wc_ger_ecu_E',group:'E'},{homeTeam:'Ivory Coast',awayTeam:'Curacao',yes:70,closes:'Jun 27',suspended:false,resolved:false,id:'wc_ivo_cur_E',group:'E'}],
-     'F':[{homeTeam:'Netherlands',awayTeam:'Japan',yes:62,closes:'Jun 14',suspended:false,resolved:false,id:'wc_net_jap_F',group:'F'},{homeTeam:'Sweden',awayTeam:'Tunisia',yes:54,closes:'Jun 16',suspended:false,resolved:false,id:'wc_swe_tun_F',group:'F'},{homeTeam:'Netherlands',awayTeam:'Sweden',yes:70,closes:'Jun 20',suspended:false,resolved:false,id:'wc_net_swe_F',group:'F'},{homeTeam:'Japan',awayTeam:'Tunisia',yes:62,closes:'Jun 20',suspended:false,resolved:false,id:'wc_jap_tun_F',group:'F'},{homeTeam:'Netherlands',awayTeam:'Tunisia',yes:71,closes:'Jun 27',suspended:false,resolved:false,id:'wc_net_tun_F',group:'F'},{homeTeam:'Japan',awayTeam:'Sweden',yes:61,closes:'Jun 27',suspended:false,resolved:false,id:'wc_jap_swe_F',group:'F'}],
-     'G':[{homeTeam:'Belgium',awayTeam:'Egypt',yes:76,closes:'Jun 15',suspended:false,resolved:false,id:'wc_bel_egy_G',group:'G'},{homeTeam:'New Zealand',awayTeam:'Iran',yes:50,closes:'Jun 16',suspended:false,resolved:false,id:'wc_new_ira_G',group:'G'},{homeTeam:'Belgium',awayTeam:'New Zealand',yes:78,closes:'Jun 19',suspended:false,resolved:false,id:'wc_bel_new_G',group:'G'},{homeTeam:'Egypt',awayTeam:'Iran',yes:52,closes:'Jun 19',suspended:false,resolved:false,id:'wc_egy_ira_G',group:'G'},{homeTeam:'Belgium',awayTeam:'Iran',yes:76,closes:'Jun 27',suspended:false,resolved:false,id:'wc_bel_ira_G',group:'G'},{homeTeam:'Egypt',awayTeam:'New Zealand',yes:55,closes:'Jun 27',suspended:false,resolved:false,id:'wc_egy_new_G',group:'G'}],
-     'H':[{homeTeam:'Spain',awayTeam:'Cape Verde',yes:85,closes:'Jun 15',suspended:false,resolved:false,id:'wc_spa_cap_H',group:'H'},{homeTeam:'Uruguay',awayTeam:'Saudi Arabia',yes:75,closes:'Jun 17',suspended:false,resolved:false,id:'wc_uru_sau_H',group:'H'},{homeTeam:'Spain',awayTeam:'Uruguay',yes:66,closes:'Jun 20',suspended:false,resolved:false,id:'wc_spa_uru_H',group:'H'},{homeTeam:'Cape Verde',awayTeam:'Saudi Arabia',yes:52,closes:'Jun 20',suspended:false,resolved:false,id:'wc_cap_sau_H',group:'H'},{homeTeam:'Spain',awayTeam:'Saudi Arabia',yes:84,closes:'Jun 27',suspended:false,resolved:false,id:'wc_spa_sau_H',group:'H'},{homeTeam:'Uruguay',awayTeam:'Cape Verde',yes:75,closes:'Jun 27',suspended:false,resolved:false,id:'wc_uru_cap_H',group:'H'}],
-     'I':[{homeTeam:'France',awayTeam:'Senegal',yes:68,closes:'Jun 15',suspended:false,resolved:false,id:'wc_fra_sen_I',group:'I'},{homeTeam:'Norway',awayTeam:'Iraq',yes:62,closes:'Jun 16',suspended:false,resolved:false,id:'wc_nor_ira_I',group:'I'},{homeTeam:'France',awayTeam:'Norway',yes:73,closes:'Jun 21',suspended:false,resolved:false,id:'wc_fra_nor_I',group:'I'},{homeTeam:'Senegal',awayTeam:'Iraq',yes:67,closes:'Jun 21',suspended:false,resolved:false,id:'wc_sen_ira_I',group:'I'},{homeTeam:'France',awayTeam:'Iraq',yes:80,closes:'Jun 27',suspended:false,resolved:false,id:'wc_fra_ira_I',group:'I'},{homeTeam:'Senegal',awayTeam:'Norway',yes:59,closes:'Jun 27',suspended:false,resolved:false,id:'wc_sen_nor_I',group:'I'}],
-     'J':[{homeTeam:'Argentina',awayTeam:'Algeria',yes:73,closes:'Jun 15',suspended:false,resolved:false,id:'wc_arg_alg_J',group:'J'},{homeTeam:'Austria',awayTeam:'Jordan',yes:68,closes:'Jun 17',suspended:false,resolved:false,id:'wc_aus_jor_J',group:'J'},{homeTeam:'Argentina',awayTeam:'Austria',yes:68,closes:'Jun 21',suspended:false,resolved:false,id:'wc_arg_aus_J',group:'J'},{homeTeam:'Algeria',awayTeam:'Jordan',yes:62,closes:'Jun 21',suspended:false,resolved:false,id:'wc_alg_jor_J',group:'J'},{homeTeam:'Argentina',awayTeam:'Jordan',yes:80,closes:'Jun 27',suspended:false,resolved:false,id:'wc_arg_jor_J',group:'J'},{homeTeam:'Algeria',awayTeam:'Austria',yes:47,closes:'Jun 27',suspended:false,resolved:false,id:'wc_alg_aus_J',group:'J'}],
-     'K':[{homeTeam:'Portugal',awayTeam:'DR Congo',yes:84,closes:'Jun 15',suspended:false,resolved:false,id:'wc_por_dr _K',group:'K'},{homeTeam:'Colombia',awayTeam:'Uzbekistan',yes:73,closes:'Jun 17',suspended:false,resolved:false,id:'wc_col_uzb_K',group:'K'},{homeTeam:'Portugal',awayTeam:'Colombia',yes:67,closes:'Jun 22',suspended:false,resolved:false,id:'wc_por_col_K',group:'K'},{homeTeam:'DR Congo',awayTeam:'Uzbekistan',yes:52,closes:'Jun 22',suspended:false,resolved:false,id:'wc_dr _uzb_K',group:'K'},{homeTeam:'Portugal',awayTeam:'Uzbekistan',yes:84,closes:'Jun 27',suspended:false,resolved:false,id:'wc_por_uzb_K',group:'K'},{homeTeam:'DR Congo',awayTeam:'Colombia',yes:33,closes:'Jun 27',suspended:false,resolved:false,id:'wc_dr _col_K',group:'K'}],
-     'L':[{homeTeam:'England',awayTeam:'Croatia',yes:62,closes:'Jun 14',suspended:false,resolved:false,id:'wc_eng_cro_L',group:'L'},{homeTeam:'Ghana',awayTeam:'Panama',yes:54,closes:'Jun 17',suspended:false,resolved:false,id:'wc_gha_pan_L',group:'L'},{homeTeam:'England',awayTeam:'Ghana',yes:76,closes:'Jun 22',suspended:false,resolved:false,id:'wc_eng_gha_L',group:'L'},{homeTeam:'Croatia',awayTeam:'Panama',yes:69,closes:'Jun 22',suspended:false,resolved:false,id:'wc_cro_pan_L',group:'L'},{homeTeam:'England',awayTeam:'Panama',yes:77,closes:'Jun 27',suspended:false,resolved:false,id:'wc_eng_pan_L',group:'L'},{homeTeam:'Croatia',awayTeam:'Ghana',yes:68,closes:'Jun 27',suspended:false,resolved:false,id:'wc_cro_gha_L',group:'L'}],
-   }},
-  {id:'tennis_french_open',name:'Roland Garros',short_name:'French Open',flag:'🇫🇷',icon:'🎾',sport:'tennis',type:'bracket',active:true,surface:'Clay',status:'Semi Finals',activeMarkets:4,
-   bracket:[{round:'Semi Finals',matches:[{home:'Alcaraz',away:'Djokovic',homeProb:54,date:'2026-06-06',status:'open'},{home:'Sinner',away:'Ruud',homeProb:63,date:'2026-06-06',status:'open'}]},{round:'Final',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-06-08',status:'pending'}]}]},
-  {id:'tennis_wimbledon',name:'Wimbledon',short_name:'Wimbledon',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',icon:'🎾',sport:'tennis',type:'bracket',active:true,surface:'Grass',status:'Opens July 2026',activeMarkets:0,
-   bracket:[{round:'First Round',matches:[{home:'TBD',away:'TBD',homeProb:50,date:'2026-07-01',status:'pending'}]}]},
-  {id:'tennis_us_open',name:'US Open',short_name:'US Open',flag:'🇺🇸',icon:'🎾',sport:'tennis',type:'bracket',active:true,surface:'Hard',status:'Opens August 2026',activeMarkets:0,
-   bracket:[]},
-  {id:'golf_the_masters',name:'The Masters',short_name:'Masters',flag:'🇺🇸',icon:'⛳',sport:'golf',type:'leaderboard',active:false,coming_soon:true,status:'Concluded — next April 2027',activeMarkets:0,bracket:[]},
-  {id:'golf_us_open',name:'US Open Golf',short_name:'US Open',flag:'🇺🇸',icon:'⛳',sport:'golf',type:'leaderboard',active:true,coming_soon:true,status:'Jun 12-15 2026 · Coming Soon',activeMarkets:0,bracket:[]},
-];
+const MOCK_TOURNAMENTS = []; // R23: No mock data — tournaments.json + engine.js
 
-const MOCK_TRADERS = [
-  {name:'Alexander Rowe',handle:'@arow_capital',profit:2400000,accuracy:94.2,trades:1847,ini:'AR',av:0,badges:['🔥','🎯','💎'],call:'Called Fed pause at 19% · +$340K'},
-  {name:'Elena Vasquez',handle:'@elv_trades',profit:891000,accuracy:88.4,trades:923,ini:'EV',av:1,badges:['🎯','💎'],call:'Called BTC rally at 34% · +$84K'},
-  {name:'Marcus Kim',handle:'@mk_forecast',profit:654000,accuracy:91.7,trades:672,ini:'MK',av:2,badges:['🔥','🎯'],call:'Called Labour win at 72% · +$29K'},
-  {name:'Priya Sharma',handle:'@ps_markets',profit:412000,accuracy:86.1,trades:548,ini:'PS',av:3,badges:['🎯'],call:'Called ETF approval at 55% · +$61K'},
-  {name:'James O\'Brien',handle:'@job_predict',profit:298000,accuracy:83.5,trades:441,ini:'JO',av:4,badges:['🔥'],call:'Called S&P 5500 at 41% · +$38K'},
-  {name:'Yuki Tanaka',handle:'@yt_analytics',profit:187000,accuracy:89.3,trades:334,ini:'YT',av:5,badges:['🎯'],call:'Called SpaceX success at 71% · +$22K'},
-  {name:'Ravi Patel',handle:'@ravi_calls',profit:142000,accuracy:81.2,trades:289,ini:'RP',av:0,badges:['🔥'],call:'Called gold rally at 38% · +$18K'},
-  {name:'Sofia Chen',handle:'@sofia_bets',profit:98000,accuracy:79.8,trades:201,ini:'SC',av:1,badges:[],call:'Called GPT-5 delay at 62% · +$12K'},
-];
+const MOCK_TRADERS = []; // R23: No mock data — leaderboard from real trades
 
 // ═══════════════════════════════════════════
 // STATE
@@ -1070,6 +988,24 @@ function mkSpark(canvas, yes, history) {
 // ═══════════════════════════════════════════
 function rendMkts(list) {
   const g = el('mkG'); g.innerHTML='';
+
+  if (!list || !list.length) {
+    g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px 24px;
+      background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);">
+      <div style="font-size:28px;margin-bottom:12px;opacity:0.3;">📡</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px;">Live data not available</div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.6;">
+        engine.js is fetching live prices from Yahoo Finance and Binance.<br>
+        Markets will appear automatically once data loads.
+      </div>
+    </div>`;
+    el('omStat').textContent = '—';
+    el('omSub').textContent = 'Loading...';
+    el('finCnt').textContent = '—';
+    if(el('mockLegend')) el('mockLegend').style.display = 'none';
+    return;
+  }
+
   // R23: a market is mock if engine isn't ready OR dataSource is not a live source
   const liveSources = ['yahoo','stooq','binance','coingecko'];
   list.forEach(m => {
@@ -1144,7 +1080,23 @@ function sortM(v) {
 // ═══════════════════════════════════════════
 function rendTournaments() {
   const sec = el('tSec'); sec.innerHTML='';
-  const ts = window.BidnessEngine.getTournaments().filter(t=>t.active);
+  const engineTs = window.BidnessEngine.getTournaments();
+
+  if (!engineTs || !engineTs.length) {
+    sec.innerHTML = `<div style="text-align:center;padding:48px 24px;
+      background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);">
+      <div style="font-size:28px;margin-bottom:12px;opacity:0.3;">📡</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px;">Live data not available</div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.6;">
+        engine.js is loading tournament and fixture data.<br>
+        Sports markets will appear once data is confirmed.
+      </div>
+    </div>`;
+    el('sptCnt').textContent = '—';
+    return;
+  }
+
+  const ts = engineTs.filter(t=>t.active);
   const grps = {football:[],tennis:[],golf:[]};
   ts.forEach(t=>{ if(grps[t.sport]) grps[t.sport].push(t); });
   const labels = {football:'⚽ Football',tennis:'🎾 Tennis',golf:'⛳ Golf'};
@@ -1433,7 +1385,7 @@ function tStab(tid, idx, btn) {
 function openTrd(id, side) {
   const m = window.BidnessEngine.getFinancialMarkets().find(x=>x.id===id)
          || window.BidnessEngine.getSportsMarkets().find(x=>x.id===id)
-         || MOCK_FIN.find(x=>x.id===id);
+         || null;
   if(!m) return;
   S.curMkt=m; S.curSide=side;
   el('mTit').textContent=m.q;
@@ -1529,7 +1481,7 @@ function closeModal(){ el('trdModal').classList.remove('open'); }
 // PORTFOLIO
 // ═══════════════════════════════════════════
 function rendPort() {
-  const allMkts=[...window.BidnessEngine.getFinancialMarkets(),...window.BidnessEngine.getSportsMarkets(),...MOCK_FIN];
+  const allMkts=[...window.BidnessEngine.getFinancialMarkets(),...window.BidnessEngine.getSportsMarkets()];
   const inv=S.pos.reduce((s,p)=>s+p.totalCost,0);
   let curVal=0;
   S.pos.forEach(p=>{
@@ -1602,8 +1554,16 @@ function initPortChart() {
 // ═══════════════════════════════════════════
 // LEADERBOARD
 // ═══════════════════════════════════════════
+const LB_UNAVAILABLE = `<div style="text-align:center;padding:36px 20px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);">
+  <div style="font-size:24px;margin-bottom:10px;opacity:0.3;">📡</div>
+  <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:5px;">Live data not available</div>
+  <div style="font-size:11.5px;color:var(--text3);">Leaderboard populates from real trade history.</div>
+</div>`;
+
 function rendPod() {
   const t=window.BidnessEngine.getLeaderboard();
+  if (!t || t.length < 3) { el('pod').innerHTML=LB_UNAVAILABLE; return; }
   const [f,s,trd]=t;
   const card=(tr,rank,cls)=>{
     const av=AVC[tr.av%AVC.length];
@@ -1623,6 +1583,7 @@ function rendPod() {
 
 function rendLB(sort='profit') {
   const traders=[...window.BidnessEngine.getLeaderboard()].sort((a,b)=>b[sort]-a[sort]);
+  if (!traders.length) { el('lbL').innerHTML=LB_UNAVAILABLE; return; }
   el('lbL').innerHTML=traders.map((tr,i)=>{
     const av=AVC[tr.av%AVC.length];
     return `<div class="lbr">
@@ -1649,17 +1610,16 @@ function sLB(key, btn) {
 // ═══════════════════════════════════════════
 // ACTIVITY FEED
 // ═══════════════════════════════════════════
-const FEED_NAMES=['Oliver Chen','Sarah Walsh','Dmitri Vol','Aisha Patel','Luke Brennan','Mei Zhang'];
-const FEED_INIS=['OC','SW','DV','AP','LB','MZ'];
-
+// Feed is populated by engine.js events only — no mock data
 function addFeed(evt, prepend=true) {
   const av=AVC[evt.av%AVC.length];
   const list=el('fdL');
+  if (!list) return;
   const div=document.createElement('div'); div.className='fdi';
   if(evt.type==='trade'){
     const tag=evt.side==='YES'?'<span class="fy2">YES</span>':'<span class="fn2">NO</span>';
-    div.innerHTML=`<div class="fav" style="background:${av};color:${evt.av<=1?'#000':'#fff'}">${evt.ini}</div>
-      <div class="fbd"><div class="ftxt"><strong>${evt.user}</strong> bought ${tag} on <span class="fmkt">"${evt.market.slice(0,48)}"</span></div>
+    div.innerHTML=`<div class="fav" style="background:${av};color:${evt.av<=1?'#000':'#fff'}">${evt.ini||'?'}</div>
+      <div class="fbd"><div class="ftxt"><strong>${evt.user}</strong> bought ${tag} on <span class="fmkt">"${(evt.market||'').slice(0,48)}"</span></div>
       <div class="famt ${evt.side.toLowerCase()}">$${fmt(evt.amount)}</div><div class="ftm">just now</div></div>`;
   } else if(evt.type==='resolve'){
     div.innerHTML=`<div class="fav" style="background:linear-gradient(135deg,#f0b429,#e8445a);color:#000">🔔</div>
@@ -1675,29 +1635,28 @@ function addFeed(evt, prepend=true) {
 }
 
 function initFeed() {
-  const init=[
-    {type:'trade',user:'Alexander Rowe',ini:'AR',av:0,side:'YES',market:'Will JPM close above $220 by month end?',amount:12400},
-    {type:'trade',user:'Elena Vasquez',ini:'EV',av:1,side:'NO',market:'Will Bitcoin close above $100K by month end?',amount:3200},
-    {type:'resolve',market:'Arsenal win Premier League?',result:'YES',payout:284000},
-    {type:'trade',user:'Marcus Kim',ini:'MK',av:2,side:'YES',market:'Will Apple close above $200 by month end?',amount:8800},
-    {type:'trade',user:'Priya Sharma',ini:'PS',av:3,side:'YES',market:'Will NVDA close above $1,100?',amount:5500},
-    {type:'trade',user:'James O\'Brien',ini:'JO',av:4,side:'NO',market:'Will TLT rally above $95?',amount:1800},
-  ];
-  init.forEach(e=>addFeed(e,false));
+  const list=el('fdL');
+  if (!list) return;
+  list.innerHTML=`<div class="fdi" style="border-color:var(--border);justify-content:center;">
+    <div style="text-align:center;padding:16px;">
+      <div style="font-size:20px;margin-bottom:8px;opacity:0.3;">📡</div>
+      <div style="font-size:12px;color:var(--text2);font-weight:600;">Live data not available</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">Activity feed populates from real trades and market events.</div>
+    </div>
+  </div>`;
 }
 
-function autoFeedTick() {
-  const t=Math.random();
-  if(t<0.12){
-    const m=MOCK_FIN[Math.floor(Math.random()*MOCK_FIN.length)];
-    addFeed({type:'resolve',market:m.q,result:Math.random()>0.5?'YES':'NO',payout:Math.floor(Math.random()*400+50)*1000});
-  } else {
-    const idx=Math.floor(Math.random()*FEED_NAMES.length);
-    const m=MOCK_FIN[Math.floor(Math.random()*MOCK_FIN.length)];
-    addFeed({type:'trade',user:FEED_NAMES[idx],ini:FEED_INIS[idx],av:idx%6,
-      side:Math.random()>0.45?'YES':'NO',market:m.q,amount:Math.floor(Math.random()*9800+200)});
-    MOCK_FIN.forEach(mk=>{const d=(Math.random()-0.5)*0.3;mk.yes=Math.max(31,Math.min(69,Math.round(mk.yes+d)));});
+function rendTrend() {
+  const mkts = window.BidnessEngine.getFinancialMarkets().slice(0,5);
+  if (!mkts.length) {
+    el('trdL').innerHTML=`<div style="font-size:11.5px;color:var(--text3);padding:8px 0;">Live data not available</div>`;
+    return;
   }
+  el('trdL').innerHTML=mkts.map((m,i)=>`<div class="trd">
+    <div style="font-family:var(--fm);font-size:10px;color:var(--text3);width:12px;">${i+1}</div>
+    <div style="flex:1;min-width:0;"><div class="trdn">${m.ticker} — ${m.q.slice(0,32)}...</div><div class="trdv">${m.vol} today</div></div>
+    <div class="trdp">${m.yes}%</div>
+  </div>`).join('');
 }
 
 function rendTrend() {
@@ -1724,15 +1683,6 @@ function toast(icon, title, msg) {
   w.appendChild(d);
   setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),220);},4000);
 }
-const RTOASTS=[
-  ['🐋','Whale alert!','Alexander Rowe just bought $48K YES on Fed rate cut'],
-  ['📈','Price moved','NVDA probability +6% this hour · Now 62%'],
-  ['✅','Market resolved!','S&P 500 above 5,400 → YES · $2.8M settled'],
-  ['⚡','New markets live','Champions League Final markets now open'],
-  ['🎯','Model updated','Daily close received · All GBM probabilities recalculated'],
-  ['⚽','Match alert!','Real Madrid vs Bayern · Kick-off in 2hrs · Betting closes soon'],
-];
-
 // ═══════════════════════════════════════════
 // DEPOSIT
 // ═══════════════════════════════════════════
@@ -1805,7 +1755,7 @@ function rendAdmin(){
 }
 function togT(id, togEl){
   const t=window.BidnessEngine.getTournaments().find(x=>x.id===id);
-  const mt=MOCK_TOURNAMENTS.find(x=>x.id===id);
+  const mt=window.BidnessEngine.getTournaments().find(x=>x.id===id);
   [t,mt].forEach(item=>{ if(item) item.active=!item.active; });
   togEl.classList.toggle('on', mt?.active||false);
   toast(mt?.active?'✅':'🔴',mt?.active?'Activated':'Deactivated',(mt?.name||id)+' markets '+(mt?.active?'now live':'suspended'));
@@ -1830,17 +1780,28 @@ function closeOB(){
 window.addEventListener('bidness:ready', e => {
   window._engineLoadTime = Date.now();
   console.log('[UI] Engine ready:', e.detail);
+  // Re-render everything with live data
   rendMkts(getFilt());
   rendTournaments();
+  rendPod();
+  rendLB();
+  rendTrend();
   const src = e.detail.dataSource;
-  el('dStV').textContent = src==='live'?'Live':'Mock';
-  el('dStS').textContent = src==='live'?'Yahoo · Binance · ESPN · club-elo.com':'Demo data';
-  el('actDSrc').textContent = src==='live'?'Yahoo · Binance · ESPN':'Mock data';
   const sptCnt = e.detail.sportsCount || 0;
-  el('sptCnt').textContent = sptCnt;
-  el('actMktCnt').textContent = (e.detail.marketCount||0) + sptCnt;
-  if(src==='live') toast('✅','Live data loaded!',`${e.detail.marketCount} financial · ${sptCnt} sports markets · Elo probabilities active`);
-  else toast('ℹ️','Demo mode','engine.js running · Fetching live data from Yahoo/Binance/ESPN...');
+  const finCnt = e.detail.marketCount || 0;
+  el('dStV').textContent = src==='live' ? 'Live' : 'Loading';
+  el('dStS').textContent = src==='live'
+    ? 'Yahoo Finance · Binance · openfootball'
+    : 'Connecting to data sources...';
+  if(el('actDSrc')) el('actDSrc').textContent = src==='live'
+    ? 'Yahoo Finance · Binance · openfootball'
+    : 'Live data not available';
+  el('sptCnt').textContent = sptCnt || '—';
+  el('actMktCnt').textContent = finCnt + sptCnt || '—';
+  if (src==='live') {
+    toast('✅', 'Live data loaded',
+      `${finCnt} financial markets · ${sptCnt} sports markets`);
+  }
 });
 window.addEventListener('bidness:markets_updated', e => {
   rendMkts(getFilt());
@@ -1867,7 +1828,8 @@ window.addEventListener('bidness:feed', e => {
 // INIT
 // ═══════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  rendMkts(MOCK_FIN);
+  // Render with empty state — engine.js will populate via events
+  rendMkts([]);
   rendTournaments();
   rendPod();
   rendLB();
@@ -1876,24 +1838,14 @@ window.addEventListener('DOMContentLoaded', () => {
   initPortChart();
   updBalUI();
 
-  // Check if engine.js loaded and is ready
+  // Show loading state until engine ready
   setTimeout(() => {
     if (!window.BidnessEngine.ready) {
-      el('engD').className='ed';
-      el('engL').textContent='Demo data';
-      el('dStS').textContent='Mock data · add engine.js for live prices';
-      toast('ℹ️','Demo mode','Running with sample data · Add engine.js for live prices');
+      el('engD').className='ed loading';
+      el('engL').textContent='Loading live data...';
+      el('dStS').textContent='Connecting to Yahoo Finance · Binance · openfootball';
     }
-  }, 3000);
-
-  // Activity feed auto-tick
-  setInterval(autoFeedTick, 10000+Math.random()*8000);
-
-  // Random toasts
-  setTimeout(()=>{
-    toast(...RTOASTS[0]);
-    setInterval(()=>toast(...RTOASTS[Math.floor(Math.random()*RTOASTS.length)]),32000+Math.random()*18000);
-  },15000);
+  }, 1000);
 
   // Keyboard shortcuts
   document.addEventListener('keydown', e=>{
