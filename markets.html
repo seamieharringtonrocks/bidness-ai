@@ -1040,8 +1040,8 @@ function rendMkts(list) {
       ${m.suspended
         ? `<div class="sb">🔒 ${m.suspendReason||'Betting suspended'}</div>`
         : `<div class="ca">
-            <button class="by" onclick="openTrd('${m.id}','YES');event.stopPropagation()">BUY YES · ${m.yes}¢</button>
-            <button class="bn" onclick="openTrd('${m.id}','NO');event.stopPropagation()">BUY NO · ${100-m.yes}¢</button>
+            <button class="by" onclick="openTrdById(${_mktReg.set(m)},1);event.stopPropagation()">BUY YES · ${m.yes}¢</button>
+            <button class="bn" onclick="openTrdById(${_mktReg.set(m)},0);event.stopPropagation()">BUY NO · ${100-m.yes}¢</button>
            </div>`}`;
     g.appendChild(div);
     setTimeout(()=>{ const c=document.getElementById('sp-'+m.id); if(c) mkSpark(c, m.yes, m.priceHistory); }, 40);
@@ -1386,35 +1386,63 @@ function tStab(tid, idx, btn) {
 // ═══════════════════════════════════════════
 // TRADE MODAL
 // ═══════════════════════════════════════════
-function openTrd(id, side) {
-  const m = window.BidnessEngine.getFinancialMarkets().find(x=>x.id===id)
-         || window.BidnessEngine.getSportsMarkets().find(x=>x.id===id)
-         || null;
-  if(!m) return;
-  S.curMkt=m; S.curSide=side;
-  el('mTit').textContent=m.q;
-  el('mSub').textContent=`${m.cat} · Closes ${m.closes} · ${m.exchange}`;
-  el('yP').textContent=m.yes+'¢'; el('nP').textContent=(100-m.yes)+'¢';
-  el('mLiq').textContent='Liq: '+m.liq;
-  el('amtI').value=50;
-  el('mPanel').classList.remove('open'); S.mdlOpen=false;
-  el('mTLbl').textContent='View probability model ▾';
-  if(m.model) {
-    el('mRows').innerHTML=Object.entries(m.model).map(([k,v])=>`<div class="mr"><span class="mk">${k.replace(/([A-Z])/g,' $1').replace(/_/g,' ').toLowerCase()}</span><span class="mv2">${v}</span></div>`).join('');
-    el('mNote').textContent='GBM model · 12-month historical data · '+(m.model.source||'');
+// Market registry — stores market objects by index so onclick can pass a simple integer
+// Avoids JSON.stringify in onclick attributes which breaks with apostrophes in team names
+const _mktReg = {
+  _store: [],
+  set(m) {
+    // Reuse existing slot if same id
+    const existing = this._store.findIndex(x => x && x.id === m.id);
+    if (existing >= 0) { this._store[existing] = m; return existing; }
+    this._store.push(m);
+    return this._store.length - 1;
+  },
+  get(idx) { return this._store[idx] || null; }
+};
+
+function openTrdById(idx, isYes) {
+  const m = _mktReg.get(idx);
+  if (!m) return;
+  openTrdObj(m, isYes ? 'YES' : 'NO');
+}
+
+// openTrdObj: accepts market object directly
+function openTrdObj(m, side) {
+  if (!m) return;
+  S.curMkt = m; S.curSide = side;
+  el('mTit').textContent = m.q;
+  el('mSub').textContent = `${m.cat} · Closes ${m.closes}${m.exchange ? ' · ' + m.exchange : ''}`;
+  el('yP').textContent = m.yes + '¢';
+  el('nP').textContent = (100 - m.yes) + '¢';
+  el('mLiq').textContent = 'Liq: ' + (m.liq || '—');
+  el('amtI').value = 50;
+  el('mPanel').classList.remove('open'); S.mdlOpen = false;
+  el('mTLbl').textContent = 'View probability model ▾';
+  if (m.model) {
+    el('mRows').innerHTML = Object.entries(m.model)
+      .map(([k,v]) => `<div class="mr"><span class="mk">${k.replace(/([A-Z])/g,' $1').replace(/_/g,' ').toLowerCase()}</span><span class="mv2">${v}</span></div>`)
+      .join('');
+    el('mNote').textContent = 'Model · ' + (m.model.source || 'live data');
   }
   setSide(side); showOrd();
   el('trdModal').classList.add('open');
 }
 
+function openTrd(id, side) {
+  const m = window.BidnessEngine.getFinancialMarkets().find(x=>x.id===id)
+         || window.BidnessEngine.getSportsMarkets().find(x=>x.id===id);
+  if (!m) return;
+  openTrdObj(m, side);
+}
+
 function openTrdSport(id, team, side, tournament) {
-  S.curMkt = {
+  const m = {
     id, q:`Will ${team} win? (${tournament})`, cat:'Sports', icon:'🏆',
     yes:55, no:45, vol:'$2.1M', liq:'$0.8M', closes:'TBD', exchange:'ESPN',
     days:7, suspended:false,
     model:{team,tournament,source:'ESPN API + Elo model',note:'Weighted Elo probability'}
   };
-  openTrd(id, side);
+  openTrdObj(m, side);
 }
 
 function setSide(side) {
