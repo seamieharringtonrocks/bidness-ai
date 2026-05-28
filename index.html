@@ -406,10 +406,41 @@ input{font-family:var(--fb);}
   .hero{padding:48px 20px 44px;}
   .lb-wrap,.rh-wrap,.profile-wrap{padding:16px;}
   .dash-center{padding:14px 16px;}
+  /* hide desktop navbar items on mobile — bottom nav takes over */
+  .nav-items{display:none;}
+  /* content padding so bottom nav doesn't cover it */
+  body{padding-bottom:68px;}
+  /* show mobile nav */
+  #eqMobileNav{display:flex!important;}
+  /* make Trade Now the standout button on mobile hero */
+  .hbtn.m{font-size:14px;padding:14px 32px;}
 }
 </style>
 </head>
 <body>
+
+<!-- MOBILE BOTTOM NAV (equity dashboard) -->
+<nav id="eqMobileNav" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;
+  background:rgba(8,11,15,0.97);backdrop-filter:blur(14px);
+  border-top:1px solid rgba(255,255,255,0.07);
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+  justify-content:space-around;align-items:center;">
+  <button onclick="showPage('home',this)" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text2);font-size:10px;font-weight:600;padding:4px;cursor:pointer;">
+    <span style="font-size:18px;">🏠</span>Home
+  </button>
+  <button onclick="showPage('legends',this)" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text2);font-size:10px;font-weight:600;padding:4px;cursor:pointer;">
+    <span style="font-size:18px;">⚡</span>Legends
+  </button>
+  <button onclick="showPage('rewards',this)" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text2);font-size:10px;font-weight:600;padding:4px;cursor:pointer;">
+    <span style="font-size:18px;">🎁</span>Rewards
+  </button>
+  <button onclick="window.location.href='markets.html'" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--teal);font-size:10px;font-weight:700;padding:4px;cursor:pointer;">
+    <span style="font-size:18px;">📈</span>Trade
+  </button>
+  <button onclick="showPage('profile',this)" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text2);font-size:10px;font-weight:600;padding:4px;cursor:pointer;">
+    <span style="font-size:18px;">👤</span>Profile
+  </button>
+</nav>
 
 <!-- ══════════════════ EQUITY RULES MODAL ══════════════════ -->
 <div class="modal-ov" id="equityModal">

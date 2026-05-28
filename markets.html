@@ -99,7 +99,7 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
 .pg{padding:22px 26px;}
 
 /* ── HERO ── */
-.mh{padding:28px 26px 32px;text-align:center;
+.mh{padding:clamp(20px,5vw,48px) clamp(16px,4vw,36px) clamp(24px,5vw,40px);text-align:center;
   background:radial-gradient(ellipse 70% 260px at 50% -40px,rgba(0,200,150,0.05) 0%,transparent 70%);}
 .ht{display:inline-flex;align-items:center;gap:5px;background:var(--yes-dim);
   border:1px solid rgba(0,200,150,0.15);border-radius:14px;padding:3px 10px;
@@ -524,7 +524,10 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
   .aside{display:none;}
 }
 @media(max-width:600px){
+  #mobileNav{display:flex!important;}
   .pg,.mh,.ss,.fr,.mg,.ts{padding-left:12px;padding-right:12px;}
+  /* Add bottom padding so content doesn't hide behind nav */
+  .main{padding-bottom:72px;}
   .hh{font-size:26px;}
   .mg{grid-template-columns:1fr;}
   .topbar{padding:6px 10px;}
@@ -687,7 +690,7 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
         <div class="bc">💰 <span id="topBal">$10,000.00</span></div>
         <button class="btn bg" onclick="openDep()">Deposit</button>
         <button class="btn bg" onclick="window.location.href='index.html'" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.25);color:#f59e0b;">🏆 Equity Race</button>
-        <button class="btn bp" onclick="goTo('markets',null)">Trade</button>
+        <button class="btn bp" style="padding:6px 16px;font-size:12.5px;font-weight:700;" onclick="goTo('markets',null)">🏦 Trade Now</button>
       </div>
     </div>
 
@@ -720,6 +723,7 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
           <button class="chip" onclick="fCat('Macro',this)">🌐 Macro</button>
           <button class="chip" onclick="fCat('Crypto',this)">₿ Crypto</button>
           <button class="chip" onclick="fCat('Energy',this)">⚡ Energy</button>
+          <button class="chip" onclick="mTab('spt',document.querySelectorAll('.tab')[1])">🏆 Sports →</button>
           <select class="ss-sel" onchange="sortM(this.value)"><option value="vol">Volume ↓</option><option value="yes">YES% ↓</option><option value="close">Closing Soon</option></select>
         </div>
         <div class="mg" id="mkG"></div>
