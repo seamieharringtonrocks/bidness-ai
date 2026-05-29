@@ -183,12 +183,24 @@
                    {id:'ETH-USD',binance:'ETHUSDT',gecko:'ethereum'}];
 
   async function fetchYahoo(ticker) {
-    const url = px(`${YAHOO}/${encodeURIComponent(ticker)}?interval=1d&range=1y&cors=true`);
-    const data = await safeFetch(url, 10000);
-    const r = data?.chart?.result?.[0];
-    if (!r) throw new Error('No Yahoo data');
-    const closes = r.indicators.quote[0].close.filter(c=>c!=null);
-    return { closes, current: r.meta.regularMarketPrice, source:'yahoo' };
+    // Try multiple Yahoo endpoints — different ones get blocked at different times
+    const endpoints = [
+      px(`https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1y`),
+      px(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1y&cors=true`),
+      px(`https://query1.finance.yahoo.com/v7/finance/spark?symbols=${encodeURIComponent(ticker)}&range=1y&interval=1d`),
+    ];
+    for (const url of endpoints) {
+      try {
+        const data = await safeFetch(url, 8000);
+        const r = data?.chart?.result?.[0] || data?.spark?.result?.[0];
+        if (!r) continue;
+        const closes = (r.indicators?.quote?.[0]?.close || r.response?.[0]?.dataGranularity && [])
+          .filter(c => c != null);
+        const current = r.meta?.regularMarketPrice || r.response?.[0]?.previousClose || closes[closes.length-1];
+        if (closes.length && current) return { closes, current, source:'yahoo' };
+      } catch(e) { /* try next */ }
+    }
+    throw new Error('Yahoo all endpoints failed');
   }
 
   async function fetchStooq(ticker) {
@@ -201,6 +213,27 @@
     if (!closes.length) throw new Error('No Stooq data');
     return { closes, current: closes[closes.length-1], source:'stooq' };
   }
+
+  // R2: Hardcoded fallback prices — updated periodically, used when all live APIs fail
+  // These ensure markets always render even during API outages
+  const FALLBACK_PRICES = {
+    'JPM':    { current: 248.50, closes: Array.from({length:252},(_,i)=>220+i*0.12), source:'fallback' },
+    'GS':     { current: 578.20, closes: Array.from({length:252},(_,i)=>490+i*0.35), source:'fallback' },
+    'AAPL':   { current: 198.40, closes: Array.from({length:252},(_,i)=>168+i*0.12), source:'fallback' },
+    'NVDA':   { current: 1087.0, closes: Array.from({length:252},(_,i)=>620+i*1.85), source:'fallback' },
+    'MSFT':   { current: 422.80, closes: Array.from({length:252},(_,i)=>375+i*0.19), source:'fallback' },
+    'GOOGL':  { current: 178.60, closes: Array.from({length:252},(_,i)=>156+i*0.09), source:'fallback' },
+    'AMZN':   { current: 208.40, closes: Array.from({length:252},(_,i)=>182+i*0.10), source:'fallback' },
+    'XOM':    { current: 114.20, closes: Array.from({length:252},(_,i)=>106+i*0.03), source:'fallback' },
+    'JNJ':    { current: 152.80, closes: Array.from({length:252},(_,i)=>158-i*0.02), source:'fallback' },
+    'SPY':    { current: 587.40, closes: Array.from({length:252},(_,i)=>486+i*0.40), source:'fallback' },
+    'QQQ':    { current: 508.20, closes: Array.from({length:252},(_,i)=>412+i*0.38), source:'fallback' },
+    'GLD':    { current: 244.80, closes: Array.from({length:252},(_,i)=>186+i*0.23), source:'fallback' },
+    'TLT':    { current: 88.40,  closes: Array.from({length:252},(_,i)=>96-i*0.03),  source:'fallback' },
+    'BRK-B':  { current: 525.60, closes: Array.from({length:252},(_,i)=>360+i*0.66), source:'fallback' },
+    'BTC-USD':{ current: 94800,  closes: Array.from({length:252},(_,i)=>42000+i*211), source:'fallback' },
+    'ETH-USD':{ current: 3480,   closes: Array.from({length:252},(_,i)=>2200+i*5.1),  source:'fallback' },
+  };
 
   async function fetchBinance(symbol) {
     // Binance allows CORS natively — no proxy needed (R19)
@@ -227,14 +260,31 @@
       catch(e) {
         console.warn(`[Engine] Binance failed ${ticker}:`, e.message);
         try { return await fetchGecko(crypto.gecko); }
-        catch(e2) { console.warn(`[Engine] CoinGecko failed ${ticker}:`, e2.message); return null; }
+        catch(e2) {
+          console.warn(`[Engine] CoinGecko failed ${ticker}:`, e2.message);
+          // R2: use fallback price so market still appears
+          if (FALLBACK_PRICES[ticker]) {
+            console.warn(`[Engine] R2: Using fallback price for ${ticker}`);
+            return { ...FALLBACK_PRICES[ticker] };
+          }
+          return null;
+        }
       }
     }
+    // Equity: try Yahoo → Stooq → fallback
     try { return await fetchYahoo(ticker); }
     catch(e) {
       console.warn(`[Engine] Yahoo failed ${ticker}:`, e.message);
       try { return await fetchStooq(ticker); } // R18
-      catch(e2) { console.warn(`[Engine] Stooq failed ${ticker}:`, e2.message); return null; }
+      catch(e2) {
+        console.warn(`[Engine] Stooq failed ${ticker}:`, e2.message);
+        // R2: use fallback price so market still appears
+        if (FALLBACK_PRICES[ticker]) {
+          console.warn(`[Engine] R2: Using fallback price for ${ticker}`);
+          return { ...FALLBACK_PRICES[ticker] };
+        }
+        return null;
+      }
     }
   }
 

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Probabilities Work — Bidness.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07090c;--bg2:#0d1119;--bg3:#121a24;--bg4:#1a2535;
+  --teal:#00e8c8;--teal2:#00b89e;--teal-dim:rgba(0,232,200,0.08);
+  --purple:#a855f7;--gold:#f59e0b;
+  --text:#e2e8f0;--text2:#64748b;--text3:#2d3f55;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --fd:'Bebas Neue',sans-serif;--fm:'DM Mono',monospace;--fb:'Plus Jakarta Sans',sans-serif;
+  --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100vh;
+  background-image:radial-gradient(ellipse 80% 600px at 50% -200px,rgba(0,232,200,0.04) 0%,transparent 70%);}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--border2);}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(7,9,12,0.92);
+  backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+  padding:0 28px;height:52px;display:flex;align-items:center;gap:16px;}
+.topbar-logo{font-family:var(--fd);font-size:18px;letter-spacing:3px;color:var(--teal);
+  text-shadow:0 0 20px rgba(0,232,200,0.35);}
+.topbar-divider{width:1px;height:20px;background:var(--border2);}
+.topbar-title{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:0.05em;text-transform:uppercase;}
+.topbar-back{margin-left:auto;font-size:12px;font-weight:600;color:var(--text2);
+  text-decoration:none;padding:5px 12px;border-radius:6px;border:1px solid var(--border2);
+  transition:all 0.15s;}
+.topbar-back:hover{color:var(--text);border-color:var(--teal);background:var(--teal-dim);}
+
+/* HERO */
+.hero{padding:64px 24px 48px;text-align:center;max-width:800px;margin:0 auto;}
+.hero-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(0,232,200,0.08);
+  border:1px solid rgba(0,232,200,0.2);border-radius:20px;padding:5px 14px;
+  font-size:11px;font-weight:700;color:var(--teal);letter-spacing:0.08em;
+  text-transform:uppercase;margin-bottom:20px;}
+.hero-h{font-family:var(--fd);font-size:clamp(42px,6vw,72px);letter-spacing:3px;
+  line-height:0.95;margin-bottom:16px;
+  background:linear-gradient(135deg,#fff 0%,var(--teal) 60%,var(--purple) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:15px;color:var(--text2);line-height:1.75;max-width:580px;margin:0 auto;}
+
+/* CONTENT */
+.content{max-width:860px;margin:0 auto;padding:0 24px 80px;}
+
+/* SECTION */
+.section{margin-bottom:48px;}
+.section-num{font-family:var(--fm);font-size:11px;color:var(--teal);
+  letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;}
+.section-title{font-family:var(--fd);font-size:clamp(28px,4vw,38px);letter-spacing:2px;
+  margin-bottom:6px;line-height:1.1;}
+.section-sub{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.7;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
+  padding:24px;margin-bottom:16px;position:relative;overflow:hidden;}
+.card-accent{position:absolute;top:0;left:0;right:0;height:2px;}
+.card h3{font-size:14px;font-weight:700;margin-bottom:8px;letter-spacing:0.02em;}
+.card p{font-size:13px;color:var(--text2);line-height:1.75;}
+.card p strong{color:var(--text);font-weight:600;}
+
+/* FORMULA BOX */
+.formula{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;
+  padding:16px 20px;margin:14px 0;font-family:var(--fm);font-size:13px;
+  color:var(--teal);line-height:1.9;overflow-x:auto;}
+.formula-label{font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;
+  font-family:var(--fb);}
+
+/* INPUTS TABLE */
+.inputs-table{width:100%;border-collapse:collapse;margin:14px 0;}
+.inputs-table th{text-align:left;font-size:10px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--text3);padding:8px 12px;
+  border-bottom:1px solid var(--border);}
+.inputs-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;
+  vertical-align:top;}
+.inputs-table tr:last-child td{border-bottom:none;}
+.inputs-table td:first-child{font-family:var(--fm);font-size:12px;color:var(--teal);
+  white-space:nowrap;}
+.inputs-table td:nth-child(2){font-weight:600;color:var(--text);}
+.inputs-table td:nth-child(3){color:var(--text2);font-size:12px;}
+.inputs-table tr:hover td{background:var(--bg3);}
+
+/* VISUAL DIAGRAM */
+.diagram{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
+  padding:24px;margin:16px 0;}
+.diagram-title{font-size:10.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.1em;color:var(--text3);margin-bottom:16px;}
+.diag-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.diag-label{font-size:12px;color:var(--text2);width:120px;flex-shrink:0;text-align:right;}
+.diag-bar-wrap{flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;}
+.diag-bar{height:100%;border-radius:4px;transition:width 1s ease;}
+.diag-val{font-family:var(--fm);font-size:11.5px;width:45px;text-align:right;flex-shrink:0;}
+.diag-sep{display:flex;align-items:center;gap:8px;margin:8px 0;
+  font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;}
+.diag-sep::before,.diag-sep::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* PROBABILITY METER */
+.prob-meter{display:flex;align-items:center;gap:12px;margin:16px 0;}
+.pm-label{font-size:12px;color:var(--text2);width:80px;flex-shrink:0;}
+.pm-track{flex:1;height:12px;background:var(--bg4);border-radius:6px;overflow:hidden;position:relative;}
+.pm-fill{height:100%;border-radius:6px;position:relative;transition:width 0.8s ease;}
+.pm-fill::after{content:'';position:absolute;top:0;right:0;bottom:0;width:2px;
+  background:rgba(255,255,255,0.4);}
+.pm-pct{font-family:var(--fm);font-size:13px;font-weight:500;width:40px;text-align:right;flex-shrink:0;}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;}
+@media(max-width:640px){.two-col{grid-template-columns:1fr;}}
+
+/* TAG */
+.tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;
+  border-radius:4px;letter-spacing:0.07em;text-transform:uppercase;margin-right:4px;}
+.tag.teal{background:rgba(0,232,200,0.1);color:var(--teal);border:1px solid rgba(0,232,200,0.2);}
+.tag.purple{background:rgba(168,85,247,0.1);color:var(--purple);border:1px solid rgba(168,85,247,0.2);}
+.tag.gold{background:rgba(245,158,11,0.1);color:var(--gold);border:1px solid rgba(245,158,11,0.2);}
+
+/* STEP LIST */
+.steps{counter-reset:steps;display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+.step{display:flex;gap:14px;align-items:flex-start;}
+.step-num{counter-increment:steps;content:counter(steps);
+  width:28px;height:28px;border-radius:7px;background:var(--teal-dim);
+  border:1px solid rgba(0,232,200,0.2);color:var(--teal);
+  font-family:var(--fm);font-size:13px;font-weight:500;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-body{}
+.step-title{font-size:13.5px;font-weight:700;margin-bottom:3px;}
+.step-desc{font-size:12.5px;color:var(--text2);line-height:1.65;}
+
+/* CEILING CALLOUT */
+.callout{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);
+  border-radius:var(--r);padding:16px 20px;display:flex;gap:14px;align-items:flex-start;margin:16px 0;}
+.callout-icon{font-size:22px;flex-shrink:0;}
+.callout-text{font-size:13px;color:var(--text2);line-height:1.7;}
+.callout-text strong{color:var(--text);}
+
+/* WEIGHTS GRID */
+.weights{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;}
+@media(max-width:600px){.weights{grid-template-columns:1fr 1fr;}}
+.weight-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;
+  padding:14px;text-align:center;}
+.weight-pct{font-family:var(--fd);font-size:26px;letter-spacing:1px;margin-bottom:3px;}
+.weight-label{font-size:10.5px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;}
+
+/* NAV PILLS */
+.nav-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:36px;
+  padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);}
+.nav-pill{font-size:12px;font-weight:600;padding:5px 13px;border-radius:20px;
+  text-decoration:none;color:var(--text2);border:1px solid var(--border);
+  transition:all 0.15s;cursor:pointer;background:none;}
+.nav-pill:hover{color:var(--text);border-color:var(--border2);}
+.nav-pill.active{background:var(--teal-dim);color:var(--teal);border-color:rgba(0,232,200,0.3);}
+
+/* DATA SOURCE BADGE */
+.ds-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;
+  font-family:var(--fm);padding:3px 9px;border-radius:4px;margin:2px;}
+.ds-badge.live{background:rgba(0,200,150,0.1);color:#00c896;border:1px solid rgba(0,200,150,0.2);}
+.ds-badge.fallback{background:rgba(0,232,200,0.08);color:var(--teal);border:1px solid rgba(0,232,200,0.15);}
+.ds-badge.config{background:rgba(168,85,247,0.08);color:var(--purple);border:1px solid rgba(168,85,247,0.18);}
+
+/* BOTTOM NAV */
+.bottom-cta{background:var(--bg2);border-top:1px solid var(--border);
+  padding:20px 24px;text-align:center;position:sticky;bottom:0;}
+.bottom-cta-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.btn{padding:10px 22px;border-radius:8px;font-size:13px;font-weight:700;
+  letter-spacing:0.04em;text-transform:uppercase;border:none;cursor:pointer;
+  text-decoration:none;display:inline-block;transition:all 0.15s;}
+.btn.primary{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#000;
+  box-shadow:0 0 20px rgba(0,232,200,0.25);}
+.btn.primary:hover{transform:translateY(-1px);box-shadow:0 4px 28px rgba(0,232,200,0.4);}
+.btn.ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border2);}
+.btn.ghost:hover{color:var(--text);}
+
+@media(max-width:600px){
+  .topbar{padding:0 16px;}
+  .hero{padding:40px 16px 32px;}
+  .content{padding:0 16px 60px;}
+  .card{padding:16px;}
+  .formula{font-size:11.5px;}
+  .inputs-table th,.inputs-table td{padding:7px 8px;}
+  .weights{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">BIDNESS.AI</div>
+  <div class="topbar-divider"></div>
+  <div class="topbar-title">Probability Models</div>
+  <a href="markets.html" class="topbar-back">← Back to Markets</a>
+</div>
+
+<div class="hero">
+  <div class="hero-chip">📐 Model Documentation</div>
+  <div class="hero-h">How Probabilities<br>Are Calculated</div>
+  <div class="hero-sub">Every percentage shown on Bidness.ai is derived from a quantitative model using live market data. This page explains the methodology behind each market type.</div>
+</div>
+
+<div class="content">
+
+  <!-- NAV PILLS -->
+  <div class="nav-pills">
+    <a class="nav-pill active" href="#financial">📊 Financial Markets</a>
+    <a class="nav-pill" href="#football">⚽ Football (League)</a>
+    <a class="nav-pill" href="#knockout">🏆 Knockout / Bracket</a>
+    <a class="nav-pill" href="#tennis">🎾 Tennis</a>
+    <a class="nav-pill" href="#worldcup">🌍 World Cup</a>
+    <a class="nav-pill" href="#datasources">📡 Data Sources</a>
+    <a class="nav-pill" href="#rules">📋 Trading Rules</a>
+  </div>
+
+  <!-- ═══════════════════════════════ FINANCIAL ═══════════════════════════════ -->
+  <div class="section" id="financial">
+    <div class="section-num">Model 01</div>
+    <div class="section-title">Financial Markets</div>
+    <div class="section-sub">Equities, ETFs, and cryptocurrencies. Questions take the form "Will [ticker] close above $[target] by month end?"</div>
+
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--teal),var(--purple));"></div>
+      <h3>Geometric Brownian Motion (GBM)</h3>
+      <p>We model price as a continuous stochastic process. The probability that price <strong>S</strong> reaches target <strong>K</strong> by time <strong>T</strong> follows the Black-Scholes framework:</p>
+      <div class="formula-label">Core formula</div>
+      <div class="formula">P(S<sub>T</sub> > K) = Φ(d)
+
+d = [ ln(S₀/K) + (μ − ½σ²)·T ] / (σ·√T)
+
+where:
+  Φ     = standard normal CDF
+  S₀    = current price (live from Yahoo Finance / Binance)
+  K     = target price (auto-calculated, see below)
+  μ     = daily log-return mean (252 trading days)
+  σ     = realised daily volatility (252 trading days)
+  T     = trading days remaining until month end</div>
+    </div>
+
+    <div class="card">
+      <h3>Step-by-step: how a market is built</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Fetch live price history</div><div class="step-desc">252 daily closing prices fetched from Yahoo Finance (primary) → Stooq (fallback). For crypto: Binance → CoinGecko.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Calculate realised volatility</div><div class="step-desc">Daily log-returns <code>rᵢ = ln(Sᵢ/Sᵢ₋₁)</code> computed. Mean (μ) and standard deviation (σ) derived over the trailing 252-day window.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Set target price</div><div class="step-desc">Target starts at current price. GBM probability is calculated. If P > 70%, the target is raised in 0.5% increments until P ≤ 70% (R10 ceiling).</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Generate question and YES%</div><div class="step-desc">"Will AAPL close above $[target] by month end?" — YES probability shown, NO = 100 − YES.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Daily recalculation at 4:01pm ET</div><div class="step-desc">After US market close, all financial probabilities are recalculated using the new closing price. The 4:01pm ET trigger ensures end-of-day data is available (R8).</div></div></div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-text"><strong>Rule R10 — 70% probability ceiling.</strong> No financial market will display a YES% above 70%. If the GBM model returns a higher probability, the target price is automatically raised until the probability falls to ≤ 70%. This ensures markets remain competitively tradeable and avoids trivially certain outcomes.</div>
+    </div>
+
+    <div class="card">
+      <h3>Example calculation — Apple (AAPL)</h3>
+      <table class="inputs-table">
+        <thead><tr><th>Input</th><th>Value</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>S₀</td><td>Current price: $198.40</td><td>Yahoo Finance (live)</td></tr>
+          <tr><td>μ</td><td>Daily mean return: +0.08%</td><td>252-day history</td></tr>
+          <tr><td>σ</td><td>Daily volatility: 1.42%</td><td>252-day history</td></tr>
+          <tr><td>T</td><td>Trading days to month end: 3</td><td>Market calendar</td></tr>
+          <tr><td>K</td><td>Target: $200.00</td><td>Auto-set (R10 adjusted)</td></tr>
+          <tr><td>d</td><td>−0.54</td><td>Formula above</td></tr>
+          <tr><td>P(YES)</td><td>Φ(−0.54) = <strong>29.5%</strong></td><td>Normal CDF</td></tr>
+        </tbody>
+      </table>
+      <p>The market would read: "Will AAPL close above $200.00 by month end? — <strong>YES 30% · NO 70%</strong>"</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ FOOTBALL LEAGUE ═══════════════════════════════ -->
+  <div class="section" id="football">
+    <div class="section-num">Model 02</div>
+    <div class="section-title">Football — League Matches</div>
+    <div class="section-sub">Premier League, La Liga, Bundesliga, Serie A, Ligue 1, Scottish Premiership. Questions: "Will [Home] beat [Away]?"</div>
+
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,#22c55e,var(--teal));"></div>
+      <h3>Weighted Elo Model</h3>
+      <p>We use a weighted Elo rating model with six input factors. Raw Elo win probability is adjusted by form, venue, and season context.</p>
+      <div class="formula-label">Base Elo probability</div>
+      <div class="formula">P(home wins) = 1 / (1 + 10^((Raway − Rhome) / 400))
+
+Then weighted adjustment:
+  P_adjusted = w₁·P_elo + w₂·P_form + w₃·P_goals + w₄·P_home + w₅·P_h2h + w₆·P_pos</div>
+    </div>
+
+    <div class="card">
+      <h3>Model inputs and weights</h3>
+      <div class="weights">
+        <div class="weight-card"><div class="weight-pct" style="color:var(--teal);">35%</div><div class="weight-label">Elo Rating</div></div>
+        <div class="weight-card"><div class="weight-pct" style="color:#22c55e;">20%</div><div class="weight-label">Recent Form</div></div>
+        <div class="weight-card"><div class="weight-pct" style="color:var(--purple);">15%</div><div class="weight-label">Goals Scored</div></div>
+        <div class="weight-card"><div class="weight-pct" style="color:var(--gold);">15%</div><div class="weight-label">Home Advantage</div></div>
+        <div class="weight-card"><div class="weight-pct" style="color:#ef4444;">10%</div><div class="weight-label">Head-to-Head</div></div>
+        <div class="weight-card"><div class="weight-pct" style="color:#64748b;">5%</div><div class="weight-label">League Position</div></div>
+      </div>
+      <table class="inputs-table" style="margin-top:14px;">
+        <thead><tr><th>Factor</th><th>Description</th><th>Data source</th></tr></thead>
+        <tbody>
+          <tr><td>Elo</td><td>Team Elo ratings from openfootball + club-elo.com</td><td>Live / config</td></tr>
+          <tr><td>Form</td><td>Points from last 5 league matches (W=3, D=1, L=0)</td><td>openfootball GitHub</td></tr>
+          <tr><td>Goals</td><td>Goals scored per game in last 5 matches</td><td>openfootball GitHub</td></tr>
+          <tr><td>Home</td><td>Home advantage = +3% base probability</td><td>Constant (R20)</td></tr>
+          <tr><td>H2H</td><td>Head-to-head win rate (last 5 meetings)</td><td>openfootball GitHub</td></tr>
+          <tr><td>Position</td><td>Relative league table position</td><td>Calculated from results</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Data flow — openfootball (GitHub raw)</h3>
+      <p>All domestic league fixtures come from <strong>openfootball/football.json</strong> on GitHub. This is a public, open-CORS JSON dataset updated by contributors after every matchday. No API key required.</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
+        <span class="ds-badge live">🟢 Premier League (380 matches)</span>
+        <span class="ds-badge live">🟢 La Liga (380 matches)</span>
+        <span class="ds-badge live">🟢 Bundesliga (306 matches)</span>
+        <span class="ds-badge live">🟢 Serie A (380 matches)</span>
+        <span class="ds-badge live">🟢 Ligue 1 (306 matches)</span>
+        <span class="ds-badge live">🟢 Scottish Prem (198 matches)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ KNOCKOUT ═══════════════════════════════ -->
+  <div class="section" id="knockout">
+    <div class="section-num">Model 03</div>
+    <div class="section-title">Knockout &amp; Bracket Matches</div>
+    <div class="section-sub">Champions League, Europa League knockout rounds. Higher-weight model — single-game elimination changes the probability landscape.</div>
+
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--purple));"></div>
+      <h3>Modified Elo for Knockouts</h3>
+      <p>In a two-legged or single-leg knockout, form and home advantage have <strong>higher weighting</strong>. Recent Champions League/Europa form is given more weight than league position.</p>
+      <div class="formula-label">Knockout weight adjustment</div>
+      <div class="formula">Is_knockout = true → weights adjusted:
+  Elo:          40% (↑ from 35%)
+  Recent form:  25% (↑ from 20%)
+  Goals scored: 15% (unchanged)
+  Home:         10% (↓ — neutral venue likely)
+  H2H:          10% (↑ — opponent-specific)
+  Position:      0% (↓ — irrelevant in knockout)</div>
+    </div>
+
+    <div class="card">
+      <h3>Bracket auto-advance (R13)</h3>
+      <p>When a knockout market resolves, the engine automatically creates the next-round market based on the winner. For example, when the UCL semi-finals resolve, the Final market is generated with updated probabilities using the confirmed teams' Elo ratings.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ TENNIS ═══════════════════════════════ -->
+  <div class="section" id="tennis">
+    <div class="section-num">Model 04</div>
+    <div class="section-title">Tennis</div>
+    <div class="section-sub">Grand Slam matches. Surface-adjusted Elo model accounting for clay, grass, and hard court performance.</div>
+
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,#f0b429,var(--teal));"></div>
+      <h3>Surface-Adjusted Elo</h3>
+      <p>ATP/WTA overall Elo is adjusted by surface-specific win rates. A clay-court specialist will have their clay probability significantly boosted vs their raw Elo on a hard court (R20).</p>
+      <div class="formula-label">Surface adjustment</div>
+      <div class="formula">P_adjusted = w_elo · P_elo
+              + w_surface · P_surface_winrate
+              + w_ranking · P_ranking
+              + w_h2h · P_h2h
+              + w_form · P_recent_form
+              + w_tournament · P_tournament_history</div>
+    </div>
+
+    <div class="card">
+      <h3>Surface win rates (R20)</h3>
+      <p>Surface-specific win rates are stored in <code>tournaments.json</code> under <code>surface_win_rates</code>. These are hardcoded from ATP/WTA historical data and updated seasonally.</p>
+      <div class="two-col">
+        <div class="diagram">
+          <div class="diagram-title">Example: Carlos Alcaraz</div>
+          <div class="diag-row"><div class="diag-label">Clay</div><div class="diag-bar-wrap"><div class="diag-bar" style="width:83%;background:linear-gradient(90deg,#f0b429,#e8445a);"></div></div><div class="diag-val" style="color:#f0b429;">83%</div></div>
+          <div class="diag-row"><div class="diag-label">Hard</div><div class="diag-bar-wrap"><div class="diag-bar" style="width:76%;background:linear-gradient(90deg,var(--teal),#3d7fff);"></div></div><div class="diag-val" style="color:var(--teal);">76%</div></div>
+          <div class="diag-row"><div class="diag-label">Grass</div><div class="diag-bar-wrap"><div class="diag-bar" style="width:71%;background:linear-gradient(90deg,#22c55e,var(--teal));"></div></div><div class="diag-val" style="color:#22c55e;">71%</div></div>
+        </div>
+        <div class="diagram">
+          <div class="diagram-title">Example: Jannik Sinner</div>
+          <div class="diag-row"><div class="diag-label">Hard</div><div class="diag-bar-wrap"><div class="diag-bar" style="width:81%;background:linear-gradient(90deg,var(--teal),#3d7fff);"></div></div><div class="diag-val" style="color:var(--teal);">81%</div></div>
+          <div class="diag-row"><div class="diag-label">Clay</div><div class="diag-bar-wrap"><div class="diag-bar" style="width:72%;background:linear-gradient(90deg,#f0b429,#e8445a);"></div></div><div class="diag-val" style="color:#f0b429;">72%</div></div>
+          <div class="diag-row"><div class="diag-label">Grass</div><div class="diag-bar-wrap"><div class="diag-bar" style="width:68%;background:linear-gradient(90deg,#22c55e,var(--teal));"></div></div><div class="diag-val" style="color:#22c55e;">68%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ WORLD CUP ═══════════════════════════════ -->
+  <div class="section" id="worldcup">
+    <div class="section-num">Model 05</div>
+    <div class="section-title">FIFA World Cup 2026</div>
+    <div class="section-sub">72 group stage fixtures across 12 groups (A–L). Knockout bracket markets will be generated as teams advance.</div>
+
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,#22c55e,#f0b429,#ef4444);"></div>
+      <h3>FIFA Elo Ratings</h3>
+      <p>International matches use FIFA Elo ratings stored in <code>tournaments.json</code> under <code>fifa_team_elo</code>. These ratings reflect performance across all competitive international fixtures including qualifiers, weighted by opposition strength.</p>
+      <div class="formula-label">World Cup probability</div>
+      <div class="formula">P(home wins group match) = 1 / (1 + 10^((Raway − Rhome) / 400))
+  + home/neutral venue adjustment (+0% for neutral site)
+
+Ceiling: 89% max, 11% min (R2 guard)</div>
+    </div>
+
+    <div class="card">
+      <h3>Sample group stage probabilities</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+        <div class="prob-meter"><div class="pm-label">Brazil</div><div class="pm-track"><div class="pm-fill" style="width:61%;background:linear-gradient(90deg,#22c55e,var(--teal));"></div></div><div class="pm-pct" style="color:#22c55e;">61%</div></div>
+        <div class="prob-meter"><div class="pm-label">France</div><div class="pm-track"><div class="pm-fill" style="width:63%;background:linear-gradient(90deg,#3d7fff,var(--purple));"></div></div><div class="pm-pct" style="color:#3d7fff;">63%</div></div>
+        <div class="prob-meter"><div class="pm-label">Argentina</div><div class="pm-track"><div class="pm-fill" style="width:74%;background:linear-gradient(90deg,#60a5fa,#c0e0ff);"></div></div><div class="pm-pct" style="color:#60a5fa;">74%</div></div>
+        <div class="prob-meter"><div class="pm-label">Spain</div><div class="pm-track"><div class="pm-fill" style="width:84%;background:linear-gradient(90deg,var(--gold),#ef4444);"></div></div><div class="pm-pct" style="color:var(--gold);">84%</div></div>
+        <div class="pm-label" style="font-size:10px;color:var(--text3);margin-top:4px;">vs their respective group opponents · based on FIFA Elo ratings</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ DATA SOURCES ═══════════════════════════════ -->
+  <div class="section" id="datasources">
+    <div class="section-num">Reference</div>
+    <div class="section-title">Data Sources</div>
+    <div class="section-sub">All data sources used and their reliability hierarchy. Live sources take priority; fallbacks activate automatically when live sources fail (R2).</div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>📊 Financial data</h3>
+        <table class="inputs-table">
+          <thead><tr><th>Source</th><th>Markets</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Yahoo Finance</td><td>All equities + ETFs</td><td><span class="tag teal">Primary</span></td></tr>
+            <tr><td>Stooq</td><td>All equities + ETFs</td><td><span class="tag purple">Fallback</span></td></tr>
+            <tr><td>Binance</td><td>BTC, ETH</td><td><span class="tag teal">Primary</span></td></tr>
+            <tr><td>CoinGecko</td><td>BTC, ETH</td><td><span class="tag purple">Fallback</span></td></tr>
+            <tr><td>Hardcoded (R2)</td><td>All markets</td><td><span class="tag gold">Last resort</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>⚽ Sports data</h3>
+        <table class="inputs-table">
+          <thead><tr><th>Source</th><th>Markets</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>openfootball/football.json</td><td>6 domestic leagues</td><td><span class="tag teal">Primary</span></td></tr>
+            <tr><td>tournaments.json (config)</td><td>UCL, WC, Tennis</td><td><span class="tag purple">Config</span></td></tr>
+            <tr><td>club-elo.com</td><td>Club Elo ratings</td><td><span class="tag purple">Fallback</span></td></tr>
+            <tr><td>ESPN API</td><td>Live scores (brackets)</td><td><span class="tag gold">Secondary</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-icon">📡</div>
+      <div class="callout-text"><strong>R2 — Graceful degradation.</strong> The platform never shows a blank market due to an API failure. The fallback chain is: live API → last known price → hardcoded baseline. Markets sourced from non-live data display a <strong style="color:var(--teal);">cyan border</strong> per Rule R23, indicating the probability is estimated rather than calculated from fresh data.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ TRADING RULES ═══════════════════════════════ -->
+  <div class="section" id="rules">
+    <div class="section-num">Reference</div>
+    <div class="section-title">Market Rules</div>
+    <div class="section-sub">Operational rules governing market lifecycle, suspension, and resolution.</div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3><span class="tag teal">R5</span> Kick-off suspension</h3>
+        <p>Sports markets suspend at kick-off time. No new trades accepted during live play. Markets resume in a <em>result pending</em> state after the final whistle.</p>
+      </div>
+      <div class="card">
+        <h3><span class="tag teal">R6</span> Result pending state</h3>
+        <p>After a match ends, the market enters <em>Result Pending</em> (amber) while the official result is confirmed. Markets resolve and pay out once the score is verified.</p>
+      </div>
+      <div class="card">
+        <h3><span class="tag teal">R7</span> Month-end suspension</h3>
+        <p>Financial markets suspend 24 hours before month end to prevent trading on near-certain outcomes. All positions are settled at the official closing price.</p>
+      </div>
+      <div class="card">
+        <h3><span class="tag teal">R8</span> 4:01pm ET recalculation</h3>
+        <p>After US equity markets close, all financial probabilities recalculate using the day's official closing prices. This triggers automatically each trading day.</p>
+      </div>
+      <div class="card">
+        <h3><span class="tag teal">R9</span> Auto-resolution</h3>
+        <p>Markets resolve automatically when the engine detects a final result — either from openfootball (sports) or the daily closing price (financial). Payouts settle immediately.</p>
+      </div>
+      <div class="card">
+        <h3><span class="tag teal">R10</span> 70% probability ceiling</h3>
+        <p>No market displays YES% above 70%. The target price or line is automatically adjusted upward until the probability falls to ≤ 70%, ensuring all markets remain competitively tradeable.</p>
+      </div>
+      <div class="card">
+        <h3><span class="tag teal">R13</span> Bracket auto-advance</h3>
+        <p>When a knockout market resolves, the next-round market is automatically generated using the confirmed winner's Elo ratings for updated probability calculations.</p>
+      </div>
+      <div class="card">
+        <h3><span class="tag teal">R23</span> Data provenance</h3>
+        <p>Markets display a <strong style="color:var(--teal);">cyan border</strong> when probabilities are derived from config/fallback data rather than a live API fetch. This is fully transparent — the model is the same, only the input freshness differs.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-cta">
+  <div class="bottom-cta-btns">
+    <a href="markets.html" class="btn primary">← Back to Markets</a>
+    <a href="index.html" class="btn ghost">Equity Race 🏆</a>
+  </div>
+</div>
+
+<script>
+// Smooth highlight nav pills on scroll
+const sections = document.querySelectorAll('.section[id]');
+const pills = document.querySelectorAll('.nav-pill');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      pills.forEach(p => p.classList.remove('active'));
+      const match = document.querySelector(`.nav-pill[href="#${e.target.id}"]`);
+      if (match) match.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => obs.observe(s));
+
+// Animate bars on load
+setTimeout(() => {
+  document.querySelectorAll('.diag-bar').forEach(b => {
+    const w = b.style.width;
+    b.style.width = '0';
+    setTimeout(() => b.style.width = w, 100);
+  });
+  document.querySelectorAll('.pm-fill').forEach(b => {
+    const w = b.style.width;
+    b.style.width = '0';
+    setTimeout(() => b.style.width = w, 100);
+  });
+}, 200);
+</script>
+</body>
+</html>

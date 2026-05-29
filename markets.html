@@ -527,7 +527,7 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
   #mobileNav{display:flex!important;}
   .pg,.mh,.ss,.fr,.mg,.ts{padding-left:12px;padding-right:12px;}
   /* Add bottom padding so content doesn't hide behind nav */
-  .main{padding-bottom:72px;}
+  .main{flex:1;min-width:0;overflow-y:auto;padding-bottom:72px;}
   .hh{font-size:26px;}
   .mg{grid-template-columns:1fr;}
   .topbar{padding:6px 10px;}
@@ -689,6 +689,7 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
         <div class="es" id="engSt"><div class="ed loading" id="engD"></div><span id="engL">Loading...</span></div>
         <div class="bc">💰 <span id="topBal">$10,000.00</span></div>
         <button class="btn bg" onclick="openDep()">Deposit</button>
+        <button class="btn bg" onclick="window.location.href='probability.html'" style="background:rgba(168,85,247,0.08);border-color:rgba(168,85,247,0.2);color:#a855f7;">📐 How Probs Work</button>
         <button class="btn bg" onclick="window.location.href='index.html'" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.25);color:#f59e0b;">🏆 Equity Race</button>
         <button class="btn bp" style="padding:6px 16px;font-size:12.5px;font-weight:700;" onclick="goTo('markets',null)">🏦 Trade Now</button>
       </div>
@@ -852,6 +853,29 @@ button,input,select{font-family:var(--fb);cursor:pointer;}
 </div>
 
 <!-- TOASTS -->
+<!-- MOBILE BOTTOM NAV -->
+<nav id="mobileNav" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;
+  background:rgba(13,17,23,0.97);backdrop-filter:blur(14px);
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+  justify-content:space-around;align-items:center;">
+  <button onclick="goTo('markets',null)" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text2);font-size:9.5px;font-weight:600;padding:4px;cursor:pointer;">
+    <span style="font-size:17px;">📈</span>Markets
+  </button>
+  <button onclick="goTo('leaderboard',null)" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text2);font-size:9.5px;font-weight:600;padding:4px;cursor:pointer;">
+    <span style="font-size:17px;">⚡</span>Legends
+  </button>
+  <button onclick="window.location.href='probability.html'" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:#a855f7;font-size:9.5px;font-weight:600;padding:4px;cursor:pointer;">
+    <span style="font-size:17px;">📐</span>Models
+  </button>
+  <button onclick="window.location.href='index.html'" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:#f59e0b;font-size:9.5px;font-weight:700;padding:4px;cursor:pointer;">
+    <span style="font-size:17px;">🏆</span>Equity
+  </button>
+  <button onclick="goTo('portfolio',null)" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text2);font-size:9.5px;font-weight:600;padding:4px;cursor:pointer;">
+    <span style="font-size:17px;">💼</span>Portfolio
+  </button>
+</nav>
+
 <div class="twr" id="twrap"></div>
 
 <script>
